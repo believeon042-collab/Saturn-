@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ignite — Launch & Trade Tokens on Solana</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark;
+--bg:#07090d;--p:#0e1218;--p2:#141a22;--ln:#1f2933;--tx:#e8edf3;--mu:#7d8a99;--g:#22d68a;--gb:rgba(34,214,138,.12);--r:#ff4d5e;--rb:rgba(255,77,94,.12)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font:14px/1.4 Inter,-apple-system,"SF Pro Text",system-ui,sans-serif;padding-bottom:84px;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit;color:inherit}
+.up{color:var(--g)}.dn{color:var(--r)}.mu{color:var(--mu)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(7,9,13,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
+.hd{max-width:1120px;margin:auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+.logo i{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#22d68a,#0ea5e9);display:grid;place-items:center;font-style:normal;font-size:16px}
+.logo small{display:block;font-size:10px;color:var(--mu);font-weight:500;letter-spacing:.08em;margin-top:-2px}
+.search{flex:1 1 100%;order:3;position:relative}
+.search input{width:100%;background:var(--p);border:1px solid var(--ln);border-radius:12px;padding:10px 14px 10px 38px;outline:0;transition:.2s}
+.search input:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gb)}
+.search:before{content:"⌕";position:absolute;left:14px;top:8px;color:var(--mu);font-size:18px}
+nav.top{display:none;gap:4px;margin-left:8px}
+nav.top a{padding:8px 12px;border-radius:10px;color:var(--mu);font-weight:500}
+nav.top a.on,nav.top a:hover{color:var(--tx);background:var(--p2)}
+.sp{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--ln);background:var(--p2);border-radius:11px;padding:9px 14px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
+.btn:hover{border-color:#2f3d4b;transform:translateY(-1px)}
+.btn.pri{background:var(--g);color:#04130c;border-color:var(--g)}.btn.pri:hover{box-shadow:0 6px 20px rgba(34,214,138,.3)}
+.btn.sell{background:var(--r);border-color:var(--r);color:#fff}
+.btn.sm{padding:7px 12px;font-size:13px}.btn.w{width:100%;padding:13px}
+.hide-m{display:none}
+main{max-width:1120px;margin:auto;padding:16px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.stat{background:var(--p);border:1px solid var(--ln);border-radius:14px;padding:12px}
+.stat span{color:var(--mu);font-size:12px;display:block}.stat b{font-size:20px;letter-spacing:-.02em}
+.demo{background:var(--p2);border:1px dashed #33414f;border-radius:10px;padding:8px 12px;color:var(--mu);font-size:12px;margin-bottom:14px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
+.tab{padding:8px 16px;border-radius:99px;border:1px solid var(--ln);background:var(--p);color:var(--mu);cursor:pointer;font-weight:600;transition:.18s}
+.tab.on{background:var(--gb);border-color:rgba(34,214,138,.4);color:var(--g)}
+.grid{display:grid;gap:12px;grid-template-columns:1fr}
+.card{background:var(--p);border:1px solid var(--ln);border-radius:16px;padding:14px;cursor:pointer;transition:.2s;position:relative}
+.card:hover{transform:translateY(-3px);border-color:#334454;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.row{display:flex;align-items:center;gap:12px}
+.av{border-radius:50%;display:grid;place-items:center;flex:none;background:radial-gradient(circle at 30% 25%,hsl(var(--h),80%,55%),hsl(var(--h),70%,22%));border:2px solid hsl(var(--h),70%,40%)}
+img.av{object-fit:cover}
+.nm b{font-size:16px}.nm span{color:var(--mu);font-size:12.5px;display:block}
+.star{margin-left:auto;background:none;border:0;font-size:20px;cursor:pointer;color:var(--mu);transition:.15s}.star.on{color:#fbbf24}.star:hover{transform:scale(1.2)}
+.px{display:flex;align-items:baseline;justify-content:space-between;margin:12px 0 10px}
+.px b{font-size:22px;letter-spacing:-.02em}
+.chg{padding:3px 8px;border-radius:8px;font-weight:600;font-size:13px}.chg.up{background:var(--gb)}.chg.dn{background:var(--rb)}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kv div{background:var(--p2);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--mu)}.kv b{display:block;color:var(--tx);font-size:14px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.empty{text-align:center;color:var(--mu);padding:50px 10px;border:1px dashed var(--ln);border-radius:16px;grid-column:1/-1}
+.box{background:var(--p);border:1px solid var(--ln);border-radius:16px;padding:14px}
+.tp{display:grid;gap:14px;grid-template-areas:"top" "chart" "trade" "act"}
+.tp>.top{grid-area:top}.tp>.chart{grid-area:chart}.tp>.trade{grid-area:trade}.tp>.act{grid-area:act}
+.ca{display:inline-flex;align-items:center;gap:8px;background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:5px 5px 5px 10px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--mu);margin-top:6px}
+.pill{font-size:10px;padding:2px 7px;border-radius:99px;background:#2a2410;color:#fbbf24;font-weight:600;vertical-align:middle;margin-left:6px}
+.m5{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}
+.m5 div{background:var(--p2);border-radius:12px;padding:10px 12px;color:var(--mu);font-size:12px}.m5 b{display:block;font-size:17px;color:var(--tx)}
+.tf{display:flex;gap:6px;margin-bottom:8px}
+.tf button{background:none;border:1px solid var(--ln);border-radius:8px;padding:4px 10px;color:var(--mu);cursor:pointer}.tf button.on{color:var(--g);border-color:var(--g)}
+svg.ch{width:100%;height:220px;display:block}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--p2);border-radius:12px;padding:4px;margin-bottom:12px}
+.seg button{border:0;background:none;padding:9px;border-radius:9px;font-weight:700;cursor:pointer;color:var(--mu)}
+.seg .b.on{background:var(--g);color:#04130c}.seg .s.on{background:var(--r);color:#fff}
+.in{width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:12px;padding:12px;outline:0;transition:.2s}
+.in:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gb)}
+label{display:block;font-size:12px;color:var(--mu);margin:12px 0 5px}
+.chips{display:flex;gap:6px;margin-top:8px}.chips button{flex:1;background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:6px;cursor:pointer;color:var(--mu)}.chips button:hover{color:var(--tx)}
+.est{display:flex;justify-content:space-between;color:var(--mu);font-size:13px;margin:12px 0}
+.note{font-size:11.5px;color:var(--mu);margin-top:10px;text-align:center}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th{color:var(--mu);font-weight:500;text-align:left;padding:6px 4px;font-size:12px}.tbl td{padding:8px 4px;border-top:1px solid var(--ln)}
+.tw{overflow-x:auto}
+.bar{height:5px;background:var(--p2);border-radius:9px;overflow:hidden;min-width:60px}.bar i{display:block;height:100%;background:var(--g)}
+.form{display:grid;gap:0;max-width:560px}
+.cr{display:grid;gap:18px}
+.up-img{border:1.5px dashed #33414f;border-radius:14px;padding:18px;text-align:center;color:var(--mu);cursor:pointer;display:block;margin:0}
+.up-img:hover{border-color:var(--g)}
+h1{font-size:24px;letter-spacing:-.02em;margin-bottom:4px}h2{font-size:16px;margin-bottom:10px}
+.bn{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(10,13,18,.92);backdrop-filter:blur(14px);border-top:1px solid var(--ln);display:flex;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.bn a,.bn button{background:none;border:0;color:var(--mu);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;padding:4px 14px;cursor:pointer}
+.bn a.on{color:var(--g)}.bn b{font-size:20px;font-weight:400}
+#toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,20px);background:var(--p2);border:1px solid #33414f;padding:11px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90%;text-align:center;font-size:13px}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#wm{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+#wm.open{display:flex}
+.md{width:100%;max-width:420px;background:var(--p);border:1px solid var(--ln);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));animation:in .25s}
+.wl{display:flex;align-items:center;gap:12px;width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:13px;padding:11px 12px;margin-bottom:8px;cursor:pointer;transition:.18s}.wl:hover{border-color:var(--g)}.wl span{margin-left:auto;font-size:12px}
+@media(min-width:720px){#wm{align-items:center}.md{border-radius:20px}}
+@media(min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}.search{flex:0 1 340px;order:0}nav.top,.hide-m{display:flex}.bn{display:none}body{padding-bottom:30px}#toast{bottom:30px}.m5{grid-template-columns:repeat(5,1fr)}.cr{grid-template-columns:1fr 300px;align-items:start}.stat b{font-size:24px}}
+@media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}.tp{grid-template-columns:1fr 350px;grid-template-areas:"top top" "chart trade" "act trade"}.trade{position:sticky;top:90px;align-self:start}}
+.sk{background:linear-gradient(90deg,var(--p2),#1a232d,var(--p2));background-size:200% 100%;animation:sh 1.2s infinite;border-radius:10px}@keyframes sh{to{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<header><div class="hd">
+ <a class="logo" href="#/"><i>🔥</i><div>Ignite<small>LAUNCH · TRADE</small></div></a>
+ <nav class="top"><a href="#/" data-n="home">Discover</a><a href="#/create" data-n="create">Create Token</a></nav>
+ <div class="sp"></div>
+ <a class="btn pri hide-m" href="#/create">＋ Create Token</a>
+ <button class="btn" id="wbtn" data-act="wallet">Connect Wallet</button>
+ <div class="search"><input id="q" placeholder="Search name, ticker or address" autocomplete="off"></div>
+</div></header>
+<main id="app"></main>
+<nav class="bn"><a href="#/" data-n="home"><b>◉</b>Discover</a><a href="#/create" data-n="create"><b>＋</b>Create</a><button data-act="wallet"><b>◈</b><span id="wl">Wallet</span></button></nav>
+<div id="toast"></div>
+<div id="wm" data-act="wbg" role="dialog" aria-modal="true" aria-label="Wallet"></div>
+<script>
+/* ============ utils ============ */
+const $=(s,e=document)=>e.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rng=s=>()=>(s=s*16807%2147483647)/2147483647;
+const B58='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const mkAddr=(seed,n=44)=>{const r=rng(seed*97+13);let a='';for(let i=0;i<n;i++)a+=B58[Math.floor(r()*58)];return a};
+const short=a=>a.slice(0,4)+'…'+a.slice(-4);
+const usd=n=>n==null?'—':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+(n/1e3).toFixed(1)+'K':'$'+n.toFixed(0);
+const fp=p=>p==null?'—':p>=1?p.toFixed(2):p>=.01?p.toFixed(4):p>0?p.toFixed(Math.min(14,Math.ceil(-Math.log10(p))+3)):'0';
+const cn=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toFixed(2);
+const ago=m=>m<1?'just now':m<60?m+'m ago':m<1440?Math.floor(m/60)+'h ago':Math.floor(m/1440)+'d ago';
+const pc=c=>c==null?'—':(c>=0?'+':'')+c.toFixed(2)+'%';
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2800)}
+
+/* ============ services: live market data (DEX Screener public API, Solana) ============ */
+/*DATA-START*/
+const API='https://api.dexscreener.com',SOLM='So11111111111111111111111111111111111111112',MINT=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+let SOLUSD=null;const PROF=new Map(),CACHE=new Map(),POOL={ts:0,ids:[],p:null};
+class ApiErr extends Error{constructor(k,m){super(m);this.kind=k}}
+async function jget(path){const c=new AbortController(),to=setTimeout(()=>c.abort(),12000);
+ try{const r=await fetch(API+path,{signal:c.signal});
+  if(r.status===429)throw new ApiErr('rate','DEX Screener rate limit reached. Wait a moment and retry.');
+  if(!r.ok)throw new ApiErr('http','The market data API returned an error ('+r.status+').');
+  return await r.json()}
+ catch(e){if(e instanceof ApiErr)throw e;throw new ApiErr('net',e&&e.name==='AbortError'?'The market data API timed out.':'Could not reach the market data API.')}
+ finally{clearTimeout(to)}}
+const num=v=>v==null||v===''||!isFinite(+v)?null:+v;
+function toToken(p,prof){const b=p.baseToken,pcg=p.priceChange||{},mc=num(p.marketCap),fdv=num(p.fdv);
+ return{id:b.address,ca:b.address,name:b.name||'Unknown',tick:b.symbol||'?',img:(p.info&&p.info.imageUrl)||(prof&&prof.icon)||null,price:num(p.priceUsd),
+  mc:mc!=null?mc:fdv,fdv:mc==null&&fdv!=null,chg:num(pcg.h24),pcg,liq:num(p.liquidity&&p.liquidity.usd),vol:num(p.volume&&p.volume.h24),vols:p.volume||{},txns:p.txns||{},
+  born:num(p.pairCreatedAt),dex:p.dexId||'',pair:p.pairAddress||'',desc:(prof&&prof.description)||''}}
+function bestPerToken(pairs){const m=new Map();(Array.isArray(pairs)?pairs:[]).forEach(p=>{
+ if(!p||p.chainId!=='solana'||!p.baseToken||!MINT.test(p.baseToken.address||''))return;
+ const t=toToken(p,PROF.get(p.baseToken.address)),o=m.get(t.id);if(!o||(t.liq||0)>(o.liq||0))m.set(t.id,t)});return m}
+async function fetchTokens(mints,force){const need=[...new Set(mints)].filter(a=>MINT.test(a)&&(force||!CACHE.has(a)||Date.now()-CACHE.get(a).ts>15000)),ch=[];
+ for(let i=0;i<need.length;i+=30)ch.push(need.slice(i,i+30));
+ const rs=await Promise.allSettled(ch.map(c=>jget('/tokens/v1/solana/'+c.join(','))));
+ if(rs.length&&rs.every(r=>r.status==='rejected'))throw rs[0].reason;
+ rs.forEach(r=>{if(r.status==='fulfilled')bestPerToken(r.value).forEach((t,k)=>CACHE.set(k,{t,ts:Date.now()}))});
+ return mints.map(a=>CACHE.get(a)&&CACHE.get(a).t).filter(Boolean)}
+async function loadSol(force){try{const r=await fetchTokens([SOLM],force);if(r[0]&&r[0].price)SOLUSD=r[0].price}catch(e){}}
+async function loadPool(force){
+ if(!force&&POOL.ids.length&&Date.now()-POOL.ts<60000)return POOL.ids.map(a=>CACHE.get(a)&&CACHE.get(a).t).filter(Boolean);
+ if(POOL.p)return POOL.p;
+ return POOL.p=(async()=>{try{
+  const rs=await Promise.allSettled(['/token-boosts/top/v1','/token-boosts/latest/v1','/token-profiles/latest/v1'].map(jget));
+  if(rs.every(r=>r.status==='rejected'))throw rs[0].reason;
+  const ids=[];rs.forEach(r=>{if(r.status==='fulfilled'&&Array.isArray(r.value))r.value.forEach(x=>{
+   if(!x||x.chainId!=='solana'||!MINT.test(x.tokenAddress||''))return;const o=PROF.get(x.tokenAddress);
+   if(!o||(!o.description&&x.description))PROF.set(x.tokenAddress,x);if(!ids.includes(x.tokenAddress))ids.push(x.tokenAddress)})});
+  const list=await fetchTokens(ids.slice(0,90),true);loadSol();
+  POOL.ids=list.map(t=>t.id);POOL.ts=Date.now();return list}finally{POOL.p=null}})()}
+async function searchTokens(q){const d=await jget('/latest/dex/search?q='+encodeURIComponent(q)),m=bestPerToken(d&&d.pairs);
+ m.forEach((t,k)=>CACHE.set(k,{t,ts:Date.now()}));return[...m.values()].sort((a,b)=>(b.liq||0)-(a.liq||0))}
+/*DATA-END*/
+// WalletService: real Solana wallet connection via the Wallet Standard (the protocol that
+// @solana/wallet-adapter itself is built on). Wallets (Phantom, Solflare, Backpack, ...) announce
+// themselves; we list only what is actually installed. No balances/keys are ever invented here.
+let _legacy=null;
+function legacyPhantom(p){return _legacy=_legacy||{name:'Phantom',icon:'',chains:['solana:mainnet'],accounts:[],features:{
+ 'standard:connect':{connect:async o=>{const r=await p.connect(o&&o.silent?{onlyIfTrusted:true}:undefined);return{accounts:[{address:r.publicKey.toString()}]}}},
+ 'standard:disconnect':{disconnect:()=>p.disconnect()},
+ 'standard:events':{on:(ev,cb)=>{const h=()=>cb({accounts:p.publicKey?[{address:p.publicKey.toString()}]:[]});p.on('accountChanged',h);p.on('disconnect',()=>cb({accounts:[]}));return()=>{}}}}}}
+const WalletService={address:null,wallet:null,_ws:new Map(),_cb:[],_off:null,_pending:null,
+ on(f){this._cb.push(f)},_emit(){this._cb.forEach(f=>{try{f()}catch(e){}})},
+ _add(w){const f=w.features||{};if(!f['standard:connect']||!f['standard:events'])return;
+  if(!(w.chains||[]).some(c=>String(c).startsWith('solana:')))return;this._ws.set(w.name,w);this._emit();this._try()},
+ _try(){const n=this._pending;if(n&&!this.address&&this.list().some(w=>w.name===n)){this._pending=null;this.connect(n,true).catch(()=>{})}},
+ list(){const l=[...this._ws.values()],p=window.phantom&&window.phantom.solana;if(p&&p.isPhantom&&!this._ws.has('Phantom'))l.push(legacyPhantom(p));return l},
+ init(){const api={register:(...ws)=>{ws.forEach(w=>this._add(w));return()=>{}}};
+  addEventListener('wallet-standard:register-wallet',e=>{try{e.detail(api)}catch(x){}});
+  try{dispatchEvent(new CustomEvent('wallet-standard:app-ready',{detail:api}))}catch(x){}
+  try{this._pending=localStorage.getItem('ig-w')}catch(e){}
+  setTimeout(()=>this._try(),700)},
+ async connect(name,silent){const w=this.list().find(x=>x.name===name);if(!w)throw new Error('Wallet not found.');
+  const r=await w.features['standard:connect'].connect(silent?{silent:true}:undefined);
+  const a=(r&&r.accounts&&r.accounts[0])||(w.accounts&&w.accounts[0]);if(!a)throw new Error('Wallet returned no account.');
+  this._off&&this._off();this.wallet=w;this.address=a.address;
+  this._off=w.features['standard:events'].on('change',d=>{if(d&&d.accounts){if(d.accounts.length)this.address=d.accounts[0].address;else{this.address=null;this.wallet=null}this._emit()}});
+  try{localStorage.setItem('ig-w',name)}catch(e){}this._emit();return this.address},
+ async disconnect(){const w=this.wallet;try{await w?.features['standard:disconnect']?.disconnect()}catch(e){}
+  this._off&&this._off();this._off=null;this.address=null;this.wallet=null;try{localStorage.removeItem('ig-w')}catch(e){}this._emit()}};
+// TradeService: NOT implemented. Must never report success until a real signed transaction exists.
+const TradeService={async trade(){return{ok:false,reason:'On-chain trading is not connected yet — nothing was sent.'}},
+ async createToken(){return{ok:false,reason:'Token creation is not connected to Solana yet — nothing was launched.'}}};
+
+/* ============ state ============ */
+let follows=[];try{follows=JSON.parse(localStorage.getItem('ig-f')||'[]').filter(a=>MINT.test(a))}catch(e){}
+const saveF=()=>{try{localStorage.setItem('ig-f',JSON.stringify(follows))}catch(e){}};
+const S={tab:'trending',q:'',side:'buy',sub:'act',cur:null,img:null,st:'loading',err:null,items:[],remote:null,rq:'',nav:0,req:0,upd:0};
+
+/* ============ components ============ */
+const hue=k=>{let h=0;for(const c of String(k))h=(h*31+c.charCodeAt(0))%360;return h};
+const fbAv=(t,s)=>`<div class="av" style="--h:${hue(t.id||t.tick)};width:${s}px;height:${s}px;font-size:${s*.45}px">${esc((t.tick||'?').slice(0,1).toUpperCase())}</div>`;
+const Avatar=(t,s=44)=>/^https:\/\//.test(t.img||'')?`<img class="av" src="${esc(t.img)}" width="${s}" height="${s}" alt="" referrerpolicy="no-referrer" loading="lazy" data-fb="${esc(fbAv(t,s))}" onerror="this.outerHTML=this.dataset.fb">`:/^data:image\//.test(t.img||'')?`<img class="av" src="${t.img}" width="${s}" height="${s}" alt="">`:fbAv(t,s);
+const age=t=>t.born?ago(Math.max(0,Math.floor((Date.now()-t.born)/60000))):'—';
+const Chg=c=>c==null?'<span class="chg mu">—</span>':`<span class="chg ${c>=0?'up':'dn'}">${c>=0?'▲':'▼'} ${pc(c)}</span>`;
+const mcl=t=>t.fdv?'FDV':'Market cap';
+const Card=t=>`<article class="card" data-go="${esc(t.id)}">
+ <div class="row">${Avatar(t)}<div class="nm"><b>${esc(t.name)}</b><span>$${esc(t.tick)} · ${age(t)}</span></div>
+ <button class="star ${follows.includes(t.id)?'on':''}" data-act="follow" data-id="${esc(t.id)}" aria-label="Follow">${follows.includes(t.id)?'★':'☆'}</button></div>
+ <div class="px"><b>$${fp(t.price)}</b>${Chg(t.chg)}</div>
+ <div class="kv"><div>${mcl(t)}<b>${usd(t.mc)}</b></div><div>Liquidity<b>${usd(t.liq)}</b></div></div>
+ <div class="btns"><a class="btn pri" href="#/token/${esc(t.id)}" data-act="buy" data-id="${esc(t.id)}">Buy</a><a class="btn" href="#/token/${esc(t.id)}">View</a></div></article>`;
+const Skel=`<div class="card" style="cursor:default"><div class="row"><div class="sk" style="width:44px;height:44px;border-radius:50%"></div><div style="flex:1"><div class="sk" style="height:14px;width:60%;margin-bottom:7px"></div><div class="sk" style="height:11px;width:35%"></div></div></div><div class="sk" style="height:26px;margin:14px 0 10px"></div><div class="sk" style="height:50px;margin-bottom:12px"></div><div class="sk" style="height:38px"></div></div>`;
+const ErrBox=e=>`<div class="empty"><b style="color:var(--tx);font-size:15px">Market data unavailable</b><br>${esc(e&&e.kind?e.message:'Something went wrong while loading data.')}${e&&e.kind==='net'?`<br><span style="font-size:12px">Sandboxed previews (including Claude's artifact preview) block outside API requests. Host this file on your own domain to load live data.</span>`:''}<br><span style="font-size:12px">No placeholder data is shown.</span><br><button class="btn sm" style="margin-top:12px" data-act="retry">Retry</button></div>`;
+function Changes(t){return `<div class="m5" style="margin-top:0">${[['5m','m5'],['1h','h1'],['6h','h6'],['24h','h24']].map(([l,k])=>{const c=num(t.pcg[k]);return `<div>${l} change<b class="${c==null?'':c>=0?'up':'dn'}">${pc(c)}</b></div>`}).join('')}</div>
+ <div class="row" style="margin-top:12px;justify-content:space-between"><span class="note" style="margin:0;text-align:left">Price history isn't available from this data source yet.</span><a class="btn sm" target="_blank" rel="noopener" href="https://dexscreener.com/solana/${encodeURIComponent(t.pair)}">Live chart ↗</a></div>`}
+function estText(t){const v=parseFloat(($('#amt')||{}).value)||0;if(!SOLUSD||!t.price)return'—';return S.side==='buy'?cn(v*SOLUSD/t.price)+' '+t.tick:(v*t.price/SOLUSD).toFixed(4)+' SOL'}
+function Trade(t){const b=S.side==='buy',w=WalletService.address;
+ return `<div class="seg"><button class="b ${b?'on':''}" data-act="side" data-v="buy">Buy</button><button class="s ${b?'':'on'}" data-act="side" data-v="sell">Sell</button></div>
+ <label style="margin-top:0">Amount (${b?'SOL':t.tick})</label><input class="in" id="amt" type="number" min="0" step="any" placeholder="0.00" inputmode="decimal" oninput="$('#est').textContent=estText(S.cur)">
+ ${b?`<div class="chips">${[.1,.5,1,5].map(x=>`<button data-act="quick" data-v="${x}">${x} SOL</button>`).join('')}</div>`:''}
+ <div class="est"><span>You receive (est.)</span><b id="est" style="color:var(--tx)">—</b></div>
+ <div class="est" style="margin-top:0"><span>Slippage</span><select class="in" style="width:auto;padding:5px 8px"><option>1%</option><option selected>5%</option><option>10%</option></select></div>
+ <button class="btn w ${b?'pri':'sell'}" data-act="trade">${w?(b?'Buy ':'Sell ')+esc(t.tick):'Connect wallet to trade'}</button>
+ <div class="note">Estimates use live DEX Screener prices${SOLUSD?'':' (SOL price unavailable)'} and ignore fees, slippage and price impact. Trading isn't enabled — nothing is sent.</div>`}
+function Activity(t){let h;
+ if(S.sub==='act')h=`<table class="tbl"><tr><th>Window</th><th>Buys</th><th>Sells</th><th>Volume</th></tr>${[['5m','m5'],['1h','h1'],['6h','h6'],['24h','h24']].map(([l,k])=>{const x=t.txns[k]||{};return `<tr><td>${l}</td><td class="up">${x.buys==null?'—':x.buys}</td><td class="dn">${x.sells==null?'—':x.sells}</td><td>${usd(num(t.vols[k]))}</td></tr>`}).join('')}</table>`;
+ else h=`<div class="empty" style="padding:26px 10px">Holder data isn't available from this data source. It will come with direct Solana RPC integration.</div>`;
+ return `<div class="tabs" style="margin-bottom:8px">${[['act','Activity'],['h','Holders']].map(([k,l])=>`<button class="tab ${S.sub===k?'on':''}" data-act="sub" data-v="${k}">${l}</button>`).join('')}</div><div class="tw">${h}</div><div class="note">Trade counts and volume for this pair from DEX Screener. Individual transactions aren't listed.</div>`}
+
+/* ============ pages ============ */
+const TABS=[['trending','🔥 Trending'],['new','✨ New'],['gainers','📈 Gainers'],['following','★ Following']];
+function Home(){return `<div class="stats"><div class="stat"><span>Tokens</span><b id="s1">—</b></div><div class="stat"><span>Launched today</span><b id="s2">—</b></div><div class="stat"><span>Following</span><b id="fc">${follows.length}</b></div></div>
+ <div class="demo row" style="justify-content:space-between;gap:8px"><span id="dl"></span><button class="btn sm" data-act="retry">Refresh</button></div>
+ <div class="tabs" id="tabs">${TABS.map(([k,l])=>`<button class="tab ${S.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}</div><div class="grid" id="grid"></div>`}
+async function loadHome(force){const r=++S.req;S.st='loading';S.err=null;renderList();
+ try{const it=S.tab==='following'?(follows.length?await fetchTokens(follows,force):[]):await loadPool(force);if(r!==S.req)return;S.items=it;S.st='ok';S.upd=Date.now()}
+ catch(e){if(r!==S.req)return;S.st='error';S.err=e}
+ renderList()}
+function listTokens(){const q=S.q.trim().toLowerCase();let l=[...S.items];
+ if(q.length>=2&&S.remote&&S.rq===S.q.trim())l=[...S.remote];
+ else if(q)l=l.filter(t=>(t.name+' '+t.tick+' '+t.id).toLowerCase().includes(q));
+ if(S.tab==='new')l=l.filter(t=>t.born).sort((a,b)=>b.born-a.born);
+ else if(S.tab==='gainers')l=l.filter(t=>t.chg>0).sort((a,b)=>b.chg-a.chg);
+ else if(S.tab==='following')l=l.filter(t=>follows.includes(t.id));
+ else l.sort((a,b)=>(b.vol||0)-(a.vol||0));return l}
+function renderList(){const g=$('#grid');if(!g)return;const ok=S.st==='ok';
+ $('#dl').textContent=ok?'Live data · DEX Screener (Solana) · updated '+new Date(S.upd).toLocaleTimeString():S.st==='loading'?'Loading live market data…':'Live market data unavailable';
+ document.querySelectorAll('#tabs .tab').forEach((b,i)=>b.classList.toggle('on',TABS[i][0]===S.tab));
+ $('#fc').textContent=follows.length;$('#s1').textContent=ok?S.items.length:'—';$('#s2').textContent=ok?S.items.filter(t=>t.born&&Date.now()-t.born<864e5).length:'—';
+ if(S.st==='error'){g.innerHTML=ErrBox(S.err);return}
+ if(S.st==='loading'&&!S.items.length){g.innerHTML=Skel.repeat(6);return}
+ const l=listTokens();g.innerHTML=l.length?l.map(Card).join(''):`<div class="empty">${S.tab==='following'&&!S.q?'Star a token to follow it.':'No tokens match.'}</div>`}
+let _st;function searchRemote(){clearTimeout(_st);const q=S.q.trim();if(q.length<2){S.remote=null;S.rq='';renderList();return}
+ _st=setTimeout(async()=>{try{const r=await searchTokens(q);if(q!==S.q.trim())return;S.remote=r;S.rq=q}
+  catch(e){if(q!==S.q.trim())return;S.remote=null;S.rq='';toast((e.kind?e.message:'Search failed.')+' Showing matches from loaded tokens only.')}renderList()},450)}
+function TokenPage(t){S.cur=t;
+ return `<div class="tp"><section class="box top"><div class="row">${Avatar(t,56)}<div class="nm"><b style="font-size:22px">${esc(t.name)}</b><span>$${esc(t.tick)} · pair created ${age(t)}</span></div>
+ <button class="star ${follows.includes(t.id)?'on':''}" data-act="follow" data-id="${esc(t.id)}">${follows.includes(t.id)?'★':'☆'}</button></div>
+ <div class="ca">CA ${short(t.ca)}<button class="btn sm" data-act="copy" data-v="${esc(t.ca)}">Copy</button></div>
+ <p class="mu" style="margin-top:10px">${esc(t.desc||'No description provided by the token profile.')}${t.dex?` <span style="font-size:12px">· ${esc(t.dex)}</span>`:''}</p>
+ <div class="m5"><div>Price<b>$${fp(t.price)}</b></div><div>24h change<b class="${t.chg==null?'':t.chg>=0?'up':'dn'}">${pc(t.chg)}</b></div><div>${mcl(t)}<b>${usd(t.mc)}</b></div><div>Liquidity<b>${usd(t.liq)}</b></div><div>24h volume<b>${usd(t.vol)}</b></div></div></section>
+ <section class="box chart" id="chart">${Changes(t)}</section><section class="box trade" id="trade">${Trade(t)}</section><section class="box act" id="act">${Activity(t)}</section></div>`}
+const TokSkel='<div class="tp"><div class="box sk top" style="height:190px"></div><div class="box sk chart" style="height:150px"></div><div class="box sk trade" style="height:260px"></div></div>';
+async function loadToken(id,force){const r=S.nav,a=$('#app');
+ try{const [l]=await Promise.all([fetchTokens([id],force),loadSol(force)]);if(r!==S.nav)return;
+  if(!l.length){a.innerHTML='<div class="empty">No Solana trading pair found for this address.<br><a class="up" href="#/">Back to discover</a></div>';return}
+  S.side='buy';S.sub='act';a.innerHTML=TokenPage(l[0])}
+ catch(e){if(r===S.nav)a.innerHTML=ErrBox(e)}}
+function Create(){S.img=null;
+ return `<h1>Create token</h1><p class="mu" style="margin-bottom:16px">Design your token. Launching on Solana isn't connected yet — this flow doesn't submit anything yet.</p>
+ <div class="cr"><div class="box form"><label style="margin-top:0">Token image</label><label class="up-img" for="img"><span id="imgl">Tap to upload PNG / JPG</span></label><input id="img" type="file" accept="image/*" hidden onchange="pickImg(this)">
+ <label>Name</label><input class="in" id="cn" maxlength="32" placeholder="e.g. Rocket Cat" oninput="prev()">
+ <label>Ticker</label><input class="in" id="ct" maxlength="10" placeholder="e.g. RCAT" oninput="prev()">
+ <label>Description</label><textarea class="in" id="cd" rows="3" maxlength="240" placeholder="What is this token about?"></textarea>
+ <label>Website</label><input class="in" id="c1" placeholder="https://"><label>X / Twitter</label><input class="in" id="c2" placeholder="https://x.com/…"><label>Telegram</label><input class="in" id="c3" placeholder="https://t.me/…">
+ <button class="btn pri w" style="margin-top:18px" data-act="launch">Launch Token</button><div class="note">Nothing is submitted to Solana. Requires wallet + on-chain integration.</div></div>
+ <div><div class="mu" style="margin-bottom:8px;font-size:12px">PREVIEW</div><div id="pv"></div></div></div>`}
+function prev(){const t={id:'x',name:$('#cn').value||'Token name',tick:($('#ct').value||'TICK').toUpperCase(),emoji:'🚀',hue:160,img:S.img,price:null,chg:null,mc:null,liq:null,born:null};$('#pv').innerHTML=Card(t).replace('data-go="x"','').replace(/data-act="buy"/,'')}
+function pickImg(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.img=r.result;$('#imgl').textContent='✓ '+f.name;prev()};r.readAsDataURL(f)}
+
+/* ============ router ============ */
+function route(force){const p=location.hash.slice(2).split('/'),a=$('#app'),pg=p[0]||'home';S.nav++;S.req++;S.cur=null;
+ document.querySelectorAll('[data-n]').forEach(e=>e.classList.toggle('on',e.dataset.n===(pg==='token'?'home':pg)));
+ if(pg==='token'){const id=p[1]||'';if(!MINT.test(id))a.innerHTML='<div class="empty">Invalid token address. <a class="up" href="#/">Back to discover</a></div>';else{a.innerHTML=TokSkel;loadToken(id,force===true)}}
+ else if(pg==='create'){a.innerHTML=Create();prev()}
+ else{a.innerHTML=Home();loadHome(force===true)}
+ a.style.animation='none';a.offsetHeight;a.style.animation='';window.scrollTo(0,0)}
+addEventListener('hashchange',route);
+
+/* ============ events ============ */
+$('#q').addEventListener('input',e=>{S.q=e.target.value;if(location.hash.startsWith('#/token')||location.hash.startsWith('#/create'))location.hash='#/';else renderList();searchRemote()});
+function updWallet(){const w=WalletService.address;$('#wbtn').textContent=w?short(w):'Connect Wallet';$('#wl').textContent=w?short(w):'Wallet';if(S.cur&&$('#trade'))$('#trade').innerHTML=Trade(S.cur)}
+/* wallet modal */
+const W={open:false,busy:null,err:''};
+const wIcon=w=>w&&/^data:image\//.test(w.icon||'')?`<img src="${w.icon}" width="32" height="32" style="border-radius:9px" alt="">`:`<div class="av" style="--h:160;width:32px;height:32px;border-radius:9px;font-size:16px">◈</div>`;
+function renderWM(){const ws=WalletService.list(),a=WalletService.address,m=$('#wm');m.classList.toggle('open',W.open);if(!W.open)return;let b;
+ if(a)b=`<div class="row" style="margin-bottom:12px">${wIcon(WalletService.wallet)}<div class="nm"><b>${esc(WalletService.wallet.name)}</b><span class="up">Connected</span></div></div>
+  <div class="ca" style="display:flex;justify-content:space-between;width:100%">${short(a)}<button class="btn sm" data-act="copy" data-v="${a}">Copy address</button></div>
+  <div class="note" style="text-align:left">Balance isn't shown yet — reading it requires a Solana RPC connection (a later step).</div>
+  <button class="btn w" style="margin-top:12px" data-act="wdisc">Disconnect</button>`;
+ else if(ws.length)b=ws.map(w=>`<button class="wl" data-act="wpick" data-v="${esc(w.name)}">${wIcon(w)}<b>${esc(w.name)}</b><span class="mu">${W.busy===w.name?'Connecting…':'Detected'}</span></button>`).join('')+(W.err?`<div class="note dn">${esc(W.err)}</div>`:'');
+ else b=`<div class="empty" style="padding:22px 10px;margin-bottom:10px">No Solana wallet detected in this browser.<br>Install one, then reload.</div><div class="btns" style="grid-template-columns:repeat(3,1fr)"><a class="btn sm" target="_blank" rel="noopener" href="https://phantom.app">Phantom</a><a class="btn sm" target="_blank" rel="noopener" href="https://solflare.com">Solflare</a><a class="btn sm" target="_blank" rel="noopener" href="https://backpack.app">Backpack</a></div>`;
+ m.innerHTML=`<div class="md"><div class="row" style="margin-bottom:14px"><h2 style="margin:0">${a?'Wallet':'Connect a wallet'}</h2><button class="star" style="font-size:22px" data-act="wclose" aria-label="Close">✕</button></div>${b}</div>`}
+const openWM=()=>{W.open=true;W.err='';renderWM()},closeWM=()=>{W.open=false;renderWM()};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&W.open)closeWM()});
+document.addEventListener('click',async e=>{
+ const el=e.target.closest('[data-act]');
+ if(!el){const c=e.target.closest('[data-go]');if(c&&!e.target.closest('a,button'))location.hash='#/token/'+c.dataset.go;return}
+ const a=el.dataset.act,v=el.dataset.v,id=el.dataset.id;
+ if(a==='follow'){e.preventDefault();e.stopPropagation();follows=follows.includes(id)?follows.filter(x=>x!==id):[...follows,id];saveF();
+  if($('#grid'))renderList();else{el.classList.toggle('on');el.textContent=follows.includes(id)?'★':'☆'}}
+ else if(a==='tab'){S.tab=v;loadHome()}
+ else if(a==='copy'){try{await navigator.clipboard.writeText(v);toast('Contract address copied')}catch(x){toast('Copy failed — select the address manually')}}
+ else if(a==='retry'){if(location.hash.startsWith('#/token'))route(true);else if(!location.hash.startsWith('#/create'))loadHome(true)}
+ else if(a==='side'){S.side=v;$('#trade').innerHTML=Trade(S.cur)}
+ else if(a==='sub'){S.sub=v;$('#act').innerHTML=Activity(S.cur)}
+ else if(a==='quick'){$('#amt').value=v;$('#est').textContent=estText(S.cur)}
+ else if(a==='wallet')openWM();
+ else if(a==='wclose')closeWM();
+ else if(a==='wbg'){if(e.target===el)closeWM()}
+ else if(a==='wpick'){if(W.busy)return;W.busy=v;W.err='';renderWM();try{await WalletService.connect(v);W.busy=null;closeWM();toast('Wallet connected')}catch(x){W.busy=null;W.err=(x&&x.message)||'Connection was cancelled.';renderWM()}}
+ else if(a==='wdisc'){await WalletService.disconnect();closeWM();toast('Wallet disconnected')}
+ else if(a==='trade'){if(!WalletService.address)openWM();else{const r=await TradeService.trade();toast(r.reason)}}
+ else if(a==='buy'){setTimeout(()=>$('#trade')&&$('#trade').scrollIntoView({behavior:'smooth'}),80)}
+ else if(a==='launch'){const n=$('#cn').value.trim(),k=$('#ct').value.trim();if(!n||!k)return toast('Name and ticker are required');const r=await TradeService.createToken();toast(r.reason)}
+});
+WalletService.on(()=>{updWallet();if(W.open)renderWM()});WalletService.init();
+if(!location.hash)location.hash='#/';route();
+</script></body></html>
