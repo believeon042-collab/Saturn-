@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saturn — Launch & Trade Tokens on Solana</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='sg' x1='0' y1='0' x2='64' y2='64'%3E%3Cstop offset='0' stop-color='%2322d68a'/%3E%3Cstop offset='1' stop-color='%230ea5e9'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='19' fill='url(%23sg)'/%3E%3Cellipse cx='32' cy='34' rx='20' ry='6.4' fill='none' stroke='%23eafcf3' stroke-width='3' stroke-opacity='.92' transform='rotate(-13 32 34)'/%3E%3Ccircle cx='32' cy='30' r='12' fill='%23081019'/%3E%3Ccircle cx='32' cy='30' r='12' fill='none' stroke='%23eafcf3' stroke-opacity='.2' stroke-width='1'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='sg2' x1='0' y1='0' x2='64' y2='64'%3E%3Cstop offset='0' stop-color='%2322d68a'/%3E%3Cstop offset='1' stop-color='%230ea5e9'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='19' fill='url(%23sg2)'/%3E%3Cellipse cx='32' cy='34' rx='20' ry='6.4' fill='none' stroke='%23eafcf3' stroke-width='3' stroke-opacity='.92' transform='rotate(-13 32 34)'/%3E%3Ccircle cx='32' cy='30' r='12' fill='%23081019'/%3E%3Ccircle cx='32' cy='30' r='12' fill='none' stroke='%23eafcf3' stroke-opacity='.2' stroke-width='1'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0e1218">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark;
+--bg:#07090d;--p:#0e1218;--p2:#141a22;--ln:#1f2933;--tx:#e8edf3;--mu:#7d8a99;--g:#22d68a;--gb:rgba(34,214,138,.12);--r:#ff4d5e;--rb:rgba(255,77,94,.12)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font:14px/1.4 Inter,-apple-system,"SF Pro Text",system-ui,sans-serif;padding-bottom:84px;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit;color:inherit}
+.up{color:var(--g)}.dn{color:var(--r)}.mu{color:var(--mu)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(7,9,13,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
+.hd{max-width:1120px;margin:auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+.logo i{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#22d68a,#0ea5e9);display:grid;place-items:center;font-style:normal;font-size:16px}
+.logo small{display:block;font-size:10px;color:var(--mu);font-weight:500;letter-spacing:.08em;margin-top:-2px}
+.search{flex:1 1 100%;order:3;position:relative}
+.search input{width:100%;background:var(--p);border:1px solid var(--ln);border-radius:12px;padding:10px 14px 10px 38px;outline:0;transition:.2s}
+.search input:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gb)}
+.search:before{content:"⌕";position:absolute;left:14px;top:8px;color:var(--mu);font-size:18px}
+nav.top{display:none;gap:4px;margin-left:8px}
+nav.top a{padding:8px 12px;border-radius:10px;color:var(--mu);font-weight:500}
+nav.top a.on,nav.top a:hover{color:var(--tx);background:var(--p2)}
+.sp{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--ln);background:var(--p2);border-radius:11px;padding:9px 14px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
+.btn:hover{border-color:#2f3d4b;transform:translateY(-1px)}
+.btn.pri{background:var(--g);color:#04130c;border-color:var(--g)}.btn.pri:hover{box-shadow:0 6px 20px rgba(34,214,138,.3)}
+.btn.sell{background:var(--r);border-color:var(--r);color:#fff}
+.btn.sm{padding:7px 12px;font-size:13px}.btn.w{width:100%;padding:13px}
+.hide-m{display:none}
+main{max-width:1120px;margin:auto;padding:16px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.stat{background:var(--p);border:1px solid var(--ln);border-radius:14px;padding:12px}
+.stat span{color:var(--mu);font-size:12px;display:block}.stat b{font-size:20px;letter-spacing:-.02em}
+.demo{background:var(--p2);border:1px dashed #33414f;border-radius:10px;padding:8px 12px;color:var(--mu);font-size:12px;margin-bottom:14px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}
+.tab{padding:8px 16px;border-radius:99px;border:1px solid var(--ln);background:var(--p);color:var(--mu);cursor:pointer;font-weight:600;transition:.18s}
+.tab.on{background:var(--gb);border-color:rgba(34,214,138,.4);color:var(--g)}
+.grid{display:grid;gap:12px;grid-template-columns:1fr}
+.card{background:var(--p);border:1px solid var(--ln);border-radius:16px;padding:14px;cursor:pointer;transition:.2s;position:relative}
+.card:hover{transform:translateY(-3px);border-color:#334454;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+.row{display:flex;align-items:center;gap:12px}
+.av{border-radius:50%;display:grid;place-items:center;flex:none;background:radial-gradient(circle at 30% 25%,hsl(var(--h),80%,55%),hsl(var(--h),70%,22%));border:2px solid hsl(var(--h),70%,40%)}
+img.av{object-fit:cover}
+.nm b{font-size:16px}.nm span{color:var(--mu);font-size:12.5px;display:block}
+.star{margin-left:auto;background:none;border:0;font-size:20px;cursor:pointer;color:var(--mu);transition:.15s}.star.on{color:#fbbf24}.star:hover{transform:scale(1.2)}
+.px{display:flex;align-items:baseline;justify-content:space-between;margin:12px 0 10px}
+.px b{font-size:22px;letter-spacing:-.02em}
+.chg{padding:3px 8px;border-radius:8px;font-weight:600;font-size:13px}.chg.up{background:var(--gb)}.chg.dn{background:var(--rb)}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kv div{background:var(--p2);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--mu)}.kv b{display:block;color:var(--tx);font-size:14px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.empty{text-align:center;color:var(--mu);padding:50px 10px;border:1px dashed var(--ln);border-radius:16px;grid-column:1/-1}
+.box{background:var(--p);border:1px solid var(--ln);border-radius:16px;padding:14px}
+.tp{display:grid;gap:14px;grid-template-areas:"top" "chart" "trade" "act"}
+.tp>.top{grid-area:top}.tp>.chart{grid-area:chart}.tp>.trade{grid-area:trade}.tp>.act{grid-area:act}
+.ca{display:inline-flex;align-items:center;gap:8px;background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:5px 5px 5px 10px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--mu);margin-top:6px}
+.pill{font-size:10px;padding:2px 7px;border-radius:99px;background:#2a2410;color:#fbbf24;font-weight:600;vertical-align:middle;margin-left:6px}
+.m5{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}
+.m5 div{background:var(--p2);border-radius:12px;padding:10px 12px;color:var(--mu);font-size:12px}.m5 b{display:block;font-size:17px;color:var(--tx)}
+.tf{display:flex;gap:6px;margin-bottom:8px}
+.tf button{background:none;border:1px solid var(--ln);border-radius:8px;padding:4px 10px;color:var(--mu);cursor:pointer}.tf button.on{color:var(--g);border-color:var(--g)}
+svg.ch{width:100%;height:220px;display:block}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--p2);border-radius:12px;padding:4px;margin-bottom:12px}
+.seg button{border:0;background:none;padding:9px;border-radius:9px;font-weight:700;cursor:pointer;color:var(--mu)}
+.seg .b.on{background:var(--g);color:#04130c}.seg .s.on{background:var(--r);color:#fff}
+.in{width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:12px;padding:12px;outline:0;transition:.2s}
+.in:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gb)}
+label{display:block;font-size:12px;color:var(--mu);margin:12px 0 5px}
+.chips{display:flex;gap:6px;margin-top:8px}.chips button{flex:1;background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:6px;cursor:pointer;color:var(--mu)}.chips button:hover{color:var(--tx)}
+.est{display:flex;justify-content:space-between;color:var(--mu);font-size:13px;margin:12px 0}
+.note{font-size:11.5px;color:var(--mu);margin-top:10px;text-align:center}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th{color:var(--mu);font-weight:500;text-align:left;padding:6px 4px;font-size:12px}.tbl td{padding:8px 4px;border-top:1px solid var(--ln)}
+.tw{overflow-x:auto}
+.bar{height:5px;background:var(--p2);border-radius:9px;overflow:hidden;min-width:60px}.bar i{display:block;height:100%;background:var(--g)}
+.form{display:grid;gap:0;max-width:560px}
+.cr{display:grid;gap:18px}
+.up-img{border:1.5px dashed #33414f;border-radius:14px;padding:18px;text-align:center;color:var(--mu);cursor:pointer;display:block;margin:0}
+.up-img:hover{border-color:var(--g)}
+h1{font-size:24px;letter-spacing:-.02em;margin-bottom:4px}h2{font-size:16px;margin-bottom:10px}
+.bn{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(10,13,18,.92);backdrop-filter:blur(14px);border-top:1px solid var(--ln);display:flex;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.bn a,.bn button{background:none;border:0;color:var(--mu);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;padding:4px 14px;cursor:pointer}
+.bn a.on{color:var(--g)}.bn b{font-size:20px;font-weight:400}
+#toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,20px);background:var(--p2);border:1px solid #33414f;padding:11px 16px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90%;text-align:center;font-size:13px}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#wm{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)}
+#wm.open{display:flex}
+.md{width:100%;max-width:420px;background:var(--p);border:1px solid var(--ln);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));animation:in .25s}
+.wl{display:flex;align-items:center;gap:12px;width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:13px;padding:11px 12px;margin-bottom:8px;cursor:pointer;transition:.18s}.wl:hover{border-color:var(--g)}.wl span{margin-left:auto;font-size:12px}
+@media(min-width:720px){#wm{align-items:center}.md{border-radius:20px}}
+@media(min-width:720px){.grid{grid-template-columns:repeat(2,1fr)}.search{flex:0 1 340px;order:0}nav.top,.hide-m{display:flex}.bn{display:none}body{padding-bottom:30px}#toast{bottom:30px}.m5{grid-template-columns:repeat(5,1fr)}.cr{grid-template-columns:1fr 300px;align-items:start}.stat b{font-size:24px}}
+@media(min-width:960px){.grid{grid-template-columns:repeat(3,1fr)}.tp{grid-template-columns:1fr 350px;grid-template-areas:"top top" "chart trade" "act trade"}.trade{position:sticky;top:90px;align-self:start}}
+.sk{background:linear-gradient(90deg,var(--p2),#1a232d,var(--p2));background-size:200% 100%;animation:sh 1.2s infinite;border-radius:10px}@keyframes sh{to{background-position:-200% 0}}
+@media(max-width:719px){.hd{gap:8px}.hd .btn{padding:8px 10px;font-size:13px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<header><div class="hd">
+ <a class="logo" href="#/"><i><svg width="18" height="18" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><ellipse cx="16" cy="18" rx="12.5" ry="4.2" stroke="#eafcf3" stroke-width="2.4" stroke-opacity=".95" transform="rotate(-13 16 18)"/><circle cx="16" cy="14.5" r="7.2" fill="#04130c"/><circle cx="16" cy="14.5" r="7.2" fill="none" stroke="#eafcf3" stroke-opacity=".22" stroke-width="0.8"/></svg></i><div>Saturn<small>LAUNCH · TRADE</small></div></a>
+ <nav class="top"><a href="#/" data-n="home">Discover</a><a href="#/create" data-n="create">Create Token</a></nav>
+ <div class="sp"></div>
+ <a class="btn pri hide-m" href="#/create">＋ Create Token</a>
+ <span id="acct" class="row" style="gap:8px"></span>
+ <button class="btn" id="wbtn" data-act="wallet">Connect Wallet</button>
+ <div class="search"><input id="q" placeholder="Search name, ticker or address" autocomplete="off"></div>
+</div></header>
+<main id="app"></main>
+<nav class="bn"><a href="#/" data-n="home"><b>◉</b>Discover</a><a href="#/create" data-n="create"><b>＋</b>Create</a><a href="#/account" data-n="account"><b>◔</b><span id="al">Sign in</span></a><button data-act="wallet"><b>◈</b><span id="wl">Wallet</span></button></nav>
+<div id="toast"></div>
+<div id="wm" data-act="wbg" role="dialog" aria-modal="true" aria-label="Wallet"></div>
+<script>
+/* ============ utils ============ */
+const $=(s,e=document)=>e.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rng=s=>()=>(s=s*16807%2147483647)/2147483647;
+const B58='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const mkAddr=(seed,n=44)=>{const r=rng(seed*97+13);let a='';for(let i=0;i<n;i++)a+=B58[Math.floor(r()*58)];return a};
+const short=a=>a.slice(0,4)+'…'+a.slice(-4);
+const usd=n=>n==null?'—':n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+(n/1e3).toFixed(1)+'K':'$'+n.toFixed(0);
+const fp=p=>p==null?'—':p>=1?p.toFixed(2):p>=.01?p.toFixed(4):p>0?p.toFixed(Math.min(14,Math.ceil(-Math.log10(p))+3)):'0';
+const cn=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toFixed(2);
+const ago=m=>m<1?'just now':m<60?m+'m ago':m<1440?Math.floor(m/60)+'h ago':Math.floor(m/1440)+'d ago';
+const pc=c=>c==null?'—':(c>=0?'+':'')+c.toFixed(2)+'%';
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2800)}
+
+/* ============ services: live market data (DEX Screener public API, Solana) ============ */
+/*DATA-START*/
+const API='https://api.dexscreener.com',SOLM='So11111111111111111111111111111111111111112',MINT=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+let SOLUSD=null;const PROF=new Map(),CACHE=new Map(),POOL={ts:0,ids:[],p:null};
+class ApiErr extends Error{constructor(k,m){super(m);this.kind=k}}
+async function jget(path){const c=new AbortController(),to=setTimeout(()=>c.abort(),12000);
+ try{const r=await fetch(API+path,{signal:c.signal});
+  if(r.status===429)throw new ApiErr('rate','DEX Screener rate limit reached. Wait a moment and retry.');
+  if(!r.ok)throw new ApiErr('http','The market data API returned an error ('+r.status+').');
+  return await r.json()}
+ catch(e){if(e instanceof ApiErr)throw e;throw new ApiErr('net',e&&e.name==='AbortError'?'The market data API timed out.':'Could not reach the market data API.')}
+ finally{clearTimeout(to)}}
+const num=v=>v==null||v===''||!isFinite(+v)?null:+v;
+function toToken(p,prof){const b=p.baseToken,pcg=p.priceChange||{},mc=num(p.marketCap),fdv=num(p.fdv);
+ return{id:b.address,ca:b.address,name:b.name||'Unknown',tick:b.symbol||'?',img:(p.info&&p.info.imageUrl)||(prof&&prof.icon)||null,price:num(p.priceUsd),
+  mc:mc!=null?mc:fdv,fdv:mc==null&&fdv!=null,chg:num(pcg.h24),pcg,liq:num(p.liquidity&&p.liquidity.usd),vol:num(p.volume&&p.volume.h24),vols:p.volume||{},txns:p.txns||{},
+  born:num(p.pairCreatedAt),dex:p.dexId||'',pair:p.pairAddress||'',desc:(prof&&prof.description)||''}}
+function bestPerToken(pairs){const m=new Map();(Array.isArray(pairs)?pairs:[]).forEach(p=>{
+ if(!p||p.chainId!=='solana'||!p.baseToken||!MINT.test(p.baseToken.address||''))return;
+ const t=toToken(p,PROF.get(p.baseToken.address)),o=m.get(t.id);if(!o||(t.liq||0)>(o.liq||0))m.set(t.id,t)});return m}
+async function fetchTokens(mints,force){const need=[...new Set(mints)].filter(a=>MINT.test(a)&&(force||!CACHE.has(a)||Date.now()-CACHE.get(a).ts>15000)),ch=[];
+ for(let i=0;i<need.length;i+=30)ch.push(need.slice(i,i+30));
+ const rs=await Promise.allSettled(ch.map(c=>jget('/tokens/v1/solana/'+c.join(','))));
+ if(rs.length&&rs.every(r=>r.status==='rejected'))throw rs[0].reason;
+ rs.forEach(r=>{if(r.status==='fulfilled')bestPerToken(r.value).forEach((t,k)=>CACHE.set(k,{t,ts:Date.now()}))});
+ return mints.map(a=>CACHE.get(a)&&CACHE.get(a).t).filter(Boolean)}
+async function loadSol(force){try{const r=await fetchTokens([SOLM],force);if(r[0]&&r[0].price)SOLUSD=r[0].price}catch(e){}}
+async function loadPool(force){
+ if(!force&&POOL.ids.length&&Date.now()-POOL.ts<60000)return POOL.ids.map(a=>CACHE.get(a)&&CACHE.get(a).t).filter(Boolean);
+ if(POOL.p)return POOL.p;
+ return POOL.p=(async()=>{try{
+  const rs=await Promise.allSettled(['/token-boosts/top/v1','/token-boosts/latest/v1','/token-profiles/latest/v1'].map(jget));
+  if(rs.every(r=>r.status==='rejected'))throw rs[0].reason;
+  const ids=[];rs.forEach(r=>{if(r.status==='fulfilled'&&Array.isArray(r.value))r.value.forEach(x=>{
+   if(!x||x.chainId!=='solana'||!MINT.test(x.tokenAddress||''))return;const o=PROF.get(x.tokenAddress);
+   if(!o||(!o.description&&x.description))PROF.set(x.tokenAddress,x);if(!ids.includes(x.tokenAddress))ids.push(x.tokenAddress)})});
+  const list=await fetchTokens(ids.slice(0,90),true);loadSol();
+  POOL.ids=list.map(t=>t.id);POOL.ts=Date.now();return list}finally{POOL.p=null}})()}
+async function searchTokens(q){const d=await jget('/latest/dex/search?q='+encodeURIComponent(q)),m=bestPerToken(d&&d.pairs);
+ m.forEach((t,k)=>CACHE.set(k,{t,ts:Date.now()}));return[...m.values()].sort((a,b)=>(b.liq||0)-(a.liq||0))}
+/*DATA-END*/
+// WalletService: real Solana wallet connection via the Wallet Standard (the protocol that
+// @solana/wallet-adapter itself is built on). Wallets (Phantom, Solflare, Backpack, ...) announce
+// themselves; we list only what is actually installed. No balances/keys are ever invented here.
+let _legacy=null;
+function legacyPhantom(p){return _legacy=_legacy||{name:'Phantom',icon:'',chains:['solana:mainnet'],accounts:[],features:{
+ 'standard:connect':{connect:async o=>{const r=await p.connect(o&&o.silent?{onlyIfTrusted:true}:undefined);return{accounts:[{address:r.publicKey.toString()}]}}},
+ 'standard:disconnect':{disconnect:()=>p.disconnect()},
+ 'standard:events':{on:(ev,cb)=>{const h=()=>cb({accounts:p.publicKey?[{address:p.publicKey.toString()}]:[]});p.on('accountChanged',h);p.on('disconnect',()=>cb({accounts:[]}));return()=>{}}}}}}
+const WalletService={address:null,wallet:null,account:null,_ws:new Map(),_cb:[],_off:null,_pending:null,
+ on(f){this._cb.push(f)},_emit(){this._cb.forEach(f=>{try{f()}catch(e){}})},
+ _add(w){const f=w.features||{};if(!f['standard:connect']||!f['standard:events'])return;
+  if(!(w.chains||[]).some(c=>String(c).startsWith('solana:')))return;this._ws.set(w.name,w);this._emit();this._try()},
+ _try(){const n=this._pending;if(n&&!this.address&&this.list().some(w=>w.name===n)){this._pending=null;this.connect(n,true).catch(()=>{})}},
+ list(){const l=[...this._ws.values()],p=window.phantom&&window.phantom.solana;if(p&&p.isPhantom&&!this._ws.has('Phantom'))l.push(legacyPhantom(p));return l},
+ init(){const api={register:(...ws)=>{ws.forEach(w=>this._add(w));return()=>{}}};
+  addEventListener('wallet-standard:register-wallet',e=>{try{e.detail(api)}catch(x){}});
+  try{dispatchEvent(new CustomEvent('wallet-standard:app-ready',{detail:api}))}catch(x){}
+  try{this._pending=localStorage.getItem('ig-w')}catch(e){}
+  setTimeout(()=>this._try(),700)},
+ async connect(name,silent){const w=this.list().find(x=>x.name===name);if(!w)throw new Error('Wallet not found.');
+  const r=await w.features['standard:connect'].connect(silent?{silent:true}:undefined);
+  const a=(r&&r.accounts&&r.accounts[0])||(w.accounts&&w.accounts[0]);if(!a)throw new Error('Wallet returned no account.');
+  this._off&&this._off();this.wallet=w;this.address=a.address;this.account=a;
+  this._off=w.features['standard:events'].on('change',d=>{if(d&&d.accounts){if(d.accounts.length){this.address=d.accounts[0].address;this.account=d.accounts[0]}else{this.address=null;this.wallet=null;this.account=null}this._emit()}});
+  try{localStorage.setItem('ig-w',name)}catch(e){}this._emit();return this.address},
+ async disconnect(){const w=this.wallet;try{await w?.features['standard:disconnect']?.disconnect()}catch(e){}
+  this._off&&this._off();this._off=null;this.address=null;this.wallet=null;this.account=null;try{localStorage.removeItem('ig-w')}catch(e){}this._emit()},
+ // Requests a signature (and, when the wallet supports it, submission) for a raw serialized Solana transaction.
+ // Uses only Wallet Standard's own 'solana:signAndSendTransaction' / 'solana:signTransaction' features —
+ // Saturn never sees or handles a private key or seed phrase; the wallet extension does all signing internally.
+ async signAndSend(txBytes){
+  if(!this.wallet||!this.account)throw new Error('Wallet is not connected.');
+  const chains=this.wallet.chains||[],chain=chains.includes('solana:mainnet')?'solana:mainnet':(chains.find(c=>String(c).startsWith('solana:'))||'solana:mainnet');
+  const f=this.wallet.features||{};
+  if(f['solana:signAndSendTransaction']){
+   const out=await f['solana:signAndSendTransaction'].signAndSendTransaction({transaction:txBytes,account:this.account,chain,options:{skipPreflight:false}});
+   const o=Array.isArray(out)?out[0]:out;if(!o||!o.signature)throw new Error('Wallet did not return a signature.');
+   return{signature:b58encode(o.signature instanceof Uint8Array?o.signature:new Uint8Array(o.signature)),submitted:true};
+  }
+  if(f['solana:signTransaction']){
+   const out=await f['solana:signTransaction'].signTransaction({transaction:txBytes,account:this.account,chain});
+   const o=Array.isArray(out)?out[0]:out;if(!o||!o.signedTransaction)throw new Error('Wallet did not return a signed transaction.');
+   return{signedTransaction:o.signedTransaction instanceof Uint8Array?o.signedTransaction:new Uint8Array(o.signedTransaction),submitted:false};
+  }
+  throw new Error('This wallet does not support signing Solana transactions.');
+ }};
+/* ============ revenue architecture (Step 3) — NO fee is collected, NO transaction is sent ============ */
+/*FEE-START*/
+// PUBLIC_CONFIG ships to every browser, so it holds nothing secret and nothing editable from the UI.
+// ADMIN_CONFIG (real fee changes, treasury rotation, revenue data) must live on an authenticated backend — never here.
+// NEVER put private keys, seed phrases or signer secrets in frontend code.
+const PUBLIC_CONFIG=Object.freeze({
+ PLATFORM_TREASURY_WALLET:null, // TODO(team): replace with the real treasury address (public on-chain). null = not configured.
+ PLATFORM_FEE_BPS:100,          // 100 bps = 1% of the trade amount (integer 0–1000)
+ TOKEN_LAUNCH_FEE_SOL:null,     // TOKEN_LAUNCH_FEE: null = not set. Launch payments are NOT active.
+ COLLECTION_ENABLED:false});    // hard off-switch: while false, nothing is collected
+const LAMPORTS=1000000000n,ADDR=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/,SIGRE=/^[1-9A-HJ-NP-Za-km-z]{64,90}$/;
+function validateConfig(c){const e=[],b=c&&c.PLATFORM_FEE_BPS,w=c&&c.PLATFORM_TREASURY_WALLET,l=c&&c.TOKEN_LAUNCH_FEE_SOL;
+ if(!Number.isInteger(b)||b<0||b>1000)e.push('PLATFORM_FEE_BPS must be an integer from 0 to 1000 (0–10%).');
+ if(w!=null&&!(typeof w==='string'&&ADDR.test(w)))e.push('PLATFORM_TREASURY_WALLET is not a valid Solana address.');
+ if(l!=null&&!(typeof l==='number'&&isFinite(l)&&l>=0))e.push('TOKEN_LAUNCH_FEE_SOL must be null or a non-negative number.');
+ return{ok:!e.length,errors:e,treasuryReady:!e.length&&w!=null}}
+function parseSol(v){const s=v==null?'':String(v).trim();if(s==='')return{ok:true,l:0n};
+ if(!/^(\d*\.?\d+|\d+\.)$/.test(s))return{ok:false,err:'Enter a valid amount.'};
+ const[i,f='']=s.split('.');if(f.length>9)return{ok:false,err:'Max 9 decimal places.'};
+ return{ok:true,l:BigInt(i||'0')*LAMPORTS+BigInt(f.padEnd(9,'0')||'0')}}
+// Integer lamport math (no floating point). fee = amount × bps / 10,000, rounded half-up to the nearest lamport.
+// buy: total = amount + fee (user pays) · sell: total = amount − fee (user receives, before network fees)
+function quoteFee(side,lamports,cfg=PUBLIC_CONFIG){const v=validateConfig(cfg);if(!v.ok)return{ok:false,errors:v.errors};
+ const fee=(lamports*BigInt(cfg.PLATFORM_FEE_BPS)+5000n)/10000n;
+ return{ok:true,side,feeBps:cfg.PLATFORM_FEE_BPS,amount:lamports,fee,total:side==='buy'?lamports+fee:lamports-fee,treasury:cfg.PLATFORM_TREASURY_WALLET||null,treasuryReady:v.treasuryReady,collectionEnabled:cfg.COLLECTION_ENABLED===true&&v.treasuryReady}}
+function fmtSol(l){const n=l<0n,a=n?-l:l,f=(a%LAMPORTS).toString().padStart(9,'0').replace(/0+$/,'').padEnd(2,'0');
+ return(n?'-':'')+(a/LAMPORTS).toString().replace(/\B(?=(\d{3})+(?!\d))/g,',')+'.'+f}
+// Fee history record. Nothing creates records yet. A 'confirmed' record MUST carry a real on-chain signature; never invent one.
+// Future flow: trade → amount → fee → show exact totals → user approves → tx executes → fee routed to treasury
+//              → signature recorded via FeeHistory.append → RevenueService reflects it.
+const FEE_TYPES=['buy','sell','launch','creator_fee'],FEE_STATUS=['quoted','pending','confirmed','failed'];
+function validateFeeRecord(r){if(!r||typeof r!=='object')return['record required'];const e=[];
+ if(!Number.isFinite(r.timestamp))e.push('timestamp');
+ if(!FEE_TYPES.includes(r.type))e.push('type');
+ if(r.type!=='launch'&&!ADDR.test(r.tokenMint||''))e.push('tokenMint');
+ if(!ADDR.test(r.userWallet||''))e.push('userWallet');
+ if(typeof r.tradeAmount!=='bigint'||r.tradeAmount<0n)e.push('tradeAmount');
+ if(typeof r.platformFee!=='bigint'||r.platformFee<0n)e.push('platformFee');
+ if(!ADDR.test(r.treasuryWallet||''))e.push('treasuryWallet');
+ if(!FEE_STATUS.includes(r.status))e.push('status');
+ if(r.status==='confirmed'&&!SIGRE.test(r.signature||''))e.push('signature (real base58 signature required when confirmed)');
+ else if(r.signature!=null&&!SIGRE.test(r.signature))e.push('signature format');
+ return e}
+const FeeHistory={adapter:null, // future backend/indexer adapter: {list(),append(rec)}
+ async list(){return this.adapter?this.adapter.list():[]},
+ async append(r){const e=validateFeeRecord(r);if(e.length)return{ok:false,reason:'invalid_record',errors:e};
+  if(!this.adapter)return{ok:false,reason:'no_backend'};await this.adapter.append(r);return{ok:true}}};
+function aggregate(recs){const z={totalFees:0n,volume:0n,trades:0,feeTxs:0,launchFees:0n,creatorFees:0n,net:0n};
+ recs.forEach(r=>{if(r.status!=='confirmed')return;
+  if(r.type==='buy'||r.type==='sell'){z.trades++;z.volume+=r.tradeAmount;z.totalFees+=r.platformFee;if(r.platformFee>0n)z.feeTxs++}
+  else if(r.type==='launch'){z.launchFees+=r.platformFee;z.totalFees+=r.platformFee;if(r.platformFee>0n)z.feeTxs++}
+  else if(r.type==='creator_fee')z.creatorFees+=r.platformFee});
+ z.net=z.totalFees-z.creatorFees;return z}
+const RevenueService={async summary(){const rs=await FeeHistory.list();return{...aggregate(rs),records:rs,source:FeeHistory.adapter?'backend':'none'}}};
+/*FEE-END*/
+/* ============ Google authentication (Step 4) — Firebase Authentication only. Separate from the Solana wallet. ============ */
+/*AUTH-START*/
+// FIREBASE_CONFIG — fill from Firebase Console → Project settings → General → Your apps → Web app → "SDK setup and configuration".
+// These web-app values are public identifiers, not secrets; access is enforced by Firebase Auth + Authorized domains.
+// NEVER put a service-account key, Admin SDK credential or any server secret in this file.
+const FIREBASE_SDK_VERSION='12.19.0';
+const FIREBASE_CONFIG=Object.freeze({
+ apiKey:'AIzaSyA2eVGsElF1daa-cv-XTaQ6IUHHfOFCu1w',
+ authDomain:'saturn-pump.firebaseapp.com',
+ projectId:'saturn-pump',
+ storageBucket:'saturn-pump.firebasestorage.app',
+ messagingSenderId:'851198483424',
+ appId:'1:851198483424:web:242a0517d05bd845ab6985',
+ measurementId:'G-H9HWPMDDG9'});
+const isFirebaseConfigured=c=>!!c&&['apiKey','authDomain','projectId','appId'].every(k=>typeof c[k]==='string'&&c[k].trim()!==''&&!/REPLACE_WITH/i.test(c[k]));
+const CANCEL=['auth/popup-closed-by-user','auth/cancelled-popup-request','auth/user-cancelled'];
+const AUTH_ERRORS={'auth/unauthorized-domain':'This domain is not authorized for Google sign-in. Add it under Firebase Console → Authentication → Settings → Authorized domains.',
+ 'auth/operation-not-allowed':'Google sign-in is not enabled. Enable the Google provider under Firebase Console → Authentication → Sign-in method.',
+ 'auth/network-request-failed':'Network error during sign-in. Check your connection and try again.',
+ 'auth/popup-blocked':'Your browser blocked the sign-in popup. Allow popups for this site and try again.',
+ 'auth/invalid-api-key':'The Firebase API key is invalid. Check FIREBASE_CONFIG.','auth/api-key-not-valid.-please-pass-a-valid-api-key.':'The Firebase API key is invalid. Check FIREBASE_CONFIG.',
+ 'auth/configuration-not-found':'Firebase Authentication is not set up for this project yet.','auth/too-many-requests':'Too many attempts. Try again later.','auth/user-disabled':'This account has been disabled.'};
+const authErrorMessage=e=>AUTH_ERRORS[e&&e.code]||'Sign-in failed. Please try again.';
+// Only these five fields ever leave the SDK object. No ID token, access token or credential is read or stored by this app.
+const mapUser=u=>u?{uid:String(u.uid),name:u.displayName||'',email:u.email||'',photo:u.photoURL||'',emailVerified:!!u.emailVerified}:null;
+const AuthService={status:'loading',user:null,err:'',_cb:[],_auth:null,_sdk:null,_ready:null,_rerr:'',
+ loader:async()=>{const b='https://www.gstatic.com/firebasejs/'+FIREBASE_SDK_VERSION+'/',m=await Promise.all([import(b+'firebase-app.js'),import(b+'firebase-auth.js')]);return{...m[0],...m[1]}},
+ on(f){this._cb.push(f)},_emit(){this._cb.forEach(f=>{try{f()}catch(e){}})},
+ _set(st,u,err){this.status=st;this.user=u||null;this.err=err||'';this._emit()},
+ init(cfg=FIREBASE_CONFIG){if(!isFirebaseConfigured(cfg)){this._set('unconfigured');return this._ready=Promise.resolve()}
+  return this._ready=(async()=>{try{
+   this._sdk=await this.loader();this._auth=this._sdk.getAuth(this._sdk.initializeApp(cfg));
+   this._sdk.getRedirectResult(this._auth).catch(e=>{this._rerr=this.err=authErrorMessage(e);this._emit()});
+   this._sdk.onAuthStateChanged(this._auth,u=>this._set(u?'in':'out',mapUser(u),u?'':this._rerr||''),e=>this._set('error',null,authErrorMessage(e)))}  // session persists via the SDK's default local persistence
+  catch(e){this._auth=null;this._set('error',null,'Could not load Firebase (network or SDK version problem).')}})()},
+ async signIn(){if(this.status==='unconfigured')return{ok:false,reason:'unconfigured',message:'Google sign-in is not configured yet.'};
+  await this._ready;if(!this._auth)return{ok:false,reason:'error',message:this.err||'Sign-in is unavailable right now.'};
+  if(this.user)return{ok:true};const s=this._sdk,p=new s.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
+  try{await s.signInWithPopup(this._auth,p);return{ok:true}}
+  catch(e){if(CANCEL.includes(e&&e.code))return{ok:false,cancelled:true};
+   if(e&&e.code==='auth/popup-blocked'){try{await s.signInWithRedirect(this._auth,p);return{ok:true,redirecting:true}}catch(e2){e=e2}}
+   const m=authErrorMessage(e);this.err=m;this._emit();return{ok:false,message:m}}},
+ async signOut(){await this._ready;if(!this._auth)return{ok:true};try{await this._sdk.signOut(this._auth);return{ok:true}}catch(e){return{ok:false,message:'Sign-out failed. Please try again.'}}}};
+// Future Google account → platform account → wallet linking. NOTHING here writes a database record or claims ownership.
+// A wallet counts as linked ONLY after: backend issues a nonce → user signs buildMessage() with that wallet (a message signature, never a transaction)
+// → backend verifies the ed25519 signature AND the caller's Firebase ID token → backend stores the link. Only a backend may ever report 'linked'.
+const WalletLinkService={status:()=>'unlinked',
+ buildMessage({uid,wallet,nonce,issuedAt,domain}){
+  if(!uid||typeof uid!=='string'||!ADDR.test(wallet||'')||typeof nonce!=='string'||nonce.length<16||!issuedAt||!domain)throw new Error('invalid link request');
+  return domain+' wants you to link a Solana wallet to your account.\n\nAccount: '+uid+'\nWallet: '+wallet+'\nNonce: '+nonce+'\nIssued At: '+issuedAt+'\n\nSigning proves you control this wallet. It does not authorize any transaction or payment.'},
+ async requestLink(){return{ok:false,reason:'not_implemented',message:'Wallet linking is not available yet. Nothing was signed or stored.'}}};
+/*AUTH-END*/
+/* ============ on-chain trading (Step 5) — real Jupiter swap + Wallet Standard signing. No mock transactions. ============ */
+/*TRADE-START*/
+// RPC_CONFIG — set SOLANA_RPC_URL to a real Solana mainnet-beta RPC endpoint (Helius, QuickNode, Triton, your own node, etc).
+// This is a PUBLIC RPC access URL, not a secret — it identifies which RPC provider requests go to, it does not grant
+// access to any funds. NEVER put a wallet private key or seed phrase here or anywhere in this file.
+// While this is null, trading is refused with a clear message before anything is built or sent.
+const RPC_CONFIG=Object.freeze({SOLANA_RPC_URL:'https://spring-green-breeze.solana-mainnet.quiknode.pro/da7c2b2e4200870adf1f55e381948632a2de0a58/'});
+const isRpcConfigured=c=>typeof c==='string'&&c.trim()!==''&&/^https:\/\//.test(c)&&!/REPLACE_WITH/i.test(c);
+// JUPITER_CONFIG — Jupiter's swap API. The free "lite-api.jup.ag" tier needs no key (rate-limited, fine for dev/light use).
+// API_KEY is optional: a Jupiter Portal (portal.jup.ag) key for higher limits via api.jup.ag. It's a rate-limit key,
+// not a wallet secret, and is safe in frontend code the same way the Firebase web config is. null = free tier as-is.
+const JUPITER_CONFIG=Object.freeze({QUOTE_PATH:'/swap/v1/quote',SWAP_PATH:'/swap/v1/swap',API_KEY:null});
+const jupBaseUrl=()=>JUPITER_CONFIG.API_KEY?'https://api.jup.ag':'https://lite-api.jup.ag';
+const jupHeaders=()=>JUPITER_CONFIG.API_KEY?{'x-api-key':JUPITER_CONFIG.API_KEY}:{};
+class TradeErr extends Error{constructor(k,m){super(m);this.kind=k}}
+// -- minimum Solana "web3" functionality needed: base64/base58 byte encoding and plain JSON-RPC over fetch.
+// No SDK is loaded — Wallet Standard's sign features already take/return raw transaction bytes, so a full
+// @solana/web3.js is not required for this flow; this keeps the page dependency-free, matching the rest of the app.
+const B58A='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+function b58encode(bytes){let zeros=0;while(zeros<bytes.length&&bytes[zeros]===0)zeros++;
+ let n=0n;for(const b of bytes)n=(n<<8n)|BigInt(b);let out='';while(n>0n){out=B58A[Number(n%58n)]+out;n/=58n}
+ return '1'.repeat(zeros)+out}
+function b64ToBytes(b64){const bin=atob(b64),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a}
+function bytesToB64(bytes){let bin='';for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);return btoa(bin)}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function solRpc(method,params){
+ if(!isRpcConfigured(RPC_CONFIG.SOLANA_RPC_URL))throw new TradeErr('rpc_config','Solana RPC endpoint is not configured. Set RPC_CONFIG.SOLANA_RPC_URL before trading can work — nothing was sent.');
+ let res;try{res=await fetch(RPC_CONFIG.SOLANA_RPC_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})})}
+ catch(e){throw new TradeErr('rpc','Could not reach the Solana RPC endpoint.')}
+ if(!res.ok)throw new TradeErr('rpc','Solana RPC returned an error ('+res.status+').');
+ const j=await res.json().catch(()=>null);if(!j)throw new TradeErr('rpc','Solana RPC returned an invalid response.');
+ if(j.error){const m=j.error.message||'Solana RPC error.';
+  if(/insufficient|no record of a prior credit/i.test(m))throw new TradeErr('insufficient','Insufficient SOL balance for this trade (including network fees) — nothing was sent.');
+  throw new TradeErr('rpc',m)}
+ return j.result}
+async function getMintDecimals(mint){const r=await solRpc('getAccountInfo',[mint,{encoding:'jsonParsed'}]);
+ const d=r&&r.value&&r.value.data&&r.value.data.parsed&&r.value.data.parsed.info&&r.value.data.parsed.info.decimals;
+ if(typeof d!=='number')throw new TradeErr('rpc',"Could not read this token's decimals from the RPC — it may not be a standard SPL token mint.");
+ return d}
+async function confirmSignature(sig){const started=Date.now();
+ while(Date.now()-started<45000){
+  const st=await solRpc('getSignatureStatuses',[[sig],{searchTransactionHistory:true}]);
+  const v=st&&st.value&&st.value[0];
+  if(v){if(v.err)throw new TradeErr('failed','Transaction failed on-chain: '+JSON.stringify(v.err));
+   if(v.confirmationStatus==='confirmed'||v.confirmationStatus==='finalized')return v.confirmationStatus}
+  await sleep(1500)}
+ throw new TradeErr('timeout','Could not confirm within 45 seconds. It may still land on-chain — check the explorer link.')}
+async function jupQuote({inputMint,outputMint,amount,slippageBps}){
+ const u=new URL(jupBaseUrl()+JUPITER_CONFIG.QUOTE_PATH);
+ u.searchParams.set('inputMint',inputMint);u.searchParams.set('outputMint',outputMint);u.searchParams.set('amount',amount);u.searchParams.set('slippageBps',String(slippageBps));
+ let res;try{res=await fetch(u,{headers:jupHeaders()})}catch(e){throw new TradeErr('jupiter','Could not reach Jupiter.')}
+ const j=await res.json().catch(()=>null);
+ if(!res.ok||!j||j.error)throw new TradeErr('jupiter',(j&&(j.error||j.message))||'Jupiter could not find a route for this trade.');
+ return j}
+async function jupSwapTx({quoteResponse,userPublicKey}){
+ let res;try{res=await fetch(jupBaseUrl()+JUPITER_CONFIG.SWAP_PATH,{method:'POST',headers:{'content-type':'application/json',...jupHeaders()},body:JSON.stringify({quoteResponse,userPublicKey,wrapAndUnwrapSol:true,dynamicComputeUnitLimit:true})})}
+ catch(e){throw new TradeErr('jupiter','Could not reach Jupiter.')}
+ const j=await res.json().catch(()=>null);
+ if(!res.ok||!j||!j.swapTransaction)throw new TradeErr('jupiter',(j&&(j.error||j.message))||'Jupiter could not build the swap transaction.');
+ return j}
+function slippageBps(){const s=$('#slip'),v=s?s.value:'5%',n=parseFloat(v);return Math.round((isFinite(n)?n:5)*100)}
+function tradeErrMessage(e){if(e instanceof TradeErr)return e.message;
+ const s=((e&&(e.message||String(e)))||'').toLowerCase();
+ if(/reject|denied|declin|cancel/.test(s))return 'Transaction rejected in wallet — nothing was sent.';
+ if(/insufficient/.test(s))return 'Wallet reported insufficient balance for this trade — nothing was sent.';
+ if(/blockhash/.test(s))return 'The transaction expired before it could be submitted. Try again.';
+ return 'Wallet error: '+((e&&e.message)||'could not sign or send the transaction.')}
+async function setTradeSt(st,extra={}){if(st==='quoting'){S.tradeErr=null;if(!extra.tradeSig)S.tradeSig=null}
+ S.tradeSt=st;Object.assign(S,extra);const el=$('#txstat');if(el)el.innerHTML=TxStatus();
+ const btn=$('[data-act="trade"]');if(btn)btn.disabled=['quoting','building','approve','sending','confirming'].includes(st)}
+const TradeService={
+ async trade(quote){
+  if(!isRpcConfigured(RPC_CONFIG.SOLANA_RPC_URL))return{ok:false,reason:'Solana RPC endpoint is not configured yet. Trading is disabled until RPC_CONFIG.SOLANA_RPC_URL is set — nothing was sent.'};
+  if(!WalletService.address||!WalletService.wallet||!WalletService.account)return{ok:false,reason:'Wallet is not connected — nothing was sent.'};
+  if(!quote||!quote.ok)return{ok:false,reason:'Enter a valid amount first — nothing was sent.'};
+  const t=S.cur;if(!t||!ADDR.test(t.id||''))return{ok:false,reason:'No token selected — nothing was sent.'};
+  const side=quote.side;let sig=null;
+  try{
+   await setTradeSt('quoting');
+   let inputMint,outputMint,amount;
+   if(side==='buy'){inputMint=SOLM;outputMint=t.id;amount=quote.amount.toString()}
+   else{const raw=parseFloat(($('#amt')||{}).value)||0;if(raw<=0)return{ok:false,reason:'Enter a valid amount first — nothing was sent.'};
+    const dec=await getMintDecimals(t.id);inputMint=t.id;outputMint=SOLM;amount=BigInt(Math.round(raw*10**dec)).toString()}
+   const q=await jupQuote({inputMint,outputMint,amount,slippageBps:slippageBps()});
+   await setTradeSt('building');
+   const sw=await jupSwapTx({quoteResponse:q,userPublicKey:WalletService.address});
+   const txBytes=b64ToBytes(sw.swapTransaction);
+   await setTradeSt('approve');
+   const r=await WalletService.signAndSend(txBytes);
+   if(r.submitted){sig=r.signature;await setTradeSt('sending',{tradeSig:sig})}
+   else{await setTradeSt('sending');sig=await solRpc('sendTransaction',[bytesToB64(r.signedTransaction),{encoding:'base64',skipPreflight:false,maxRetries:3}]);await setTradeSt('sending',{tradeSig:sig})}
+   await setTradeSt('confirming',{tradeSig:sig});
+   const status=await confirmSignature(sig);
+   await setTradeSt('confirmed',{tradeSig:sig});
+   return{ok:true,signature:sig,status};
+  }catch(e){const msg=tradeErrMessage(e);await setTradeSt('failed',{tradeErr:msg,tradeSig:sig});return{ok:false,reason:msg,signature:sig}}
+ },
+ async createToken(){return{ok:false,reason:'Token creation is not connected to Solana yet — nothing was launched.'}}};
+/*TRADE-END*/
+
+/* ============ state ============ */
+let follows=[];try{follows=JSON.parse(localStorage.getItem('ig-f')||'[]').filter(a=>MINT.test(a))}catch(e){}
+const saveF=()=>{try{localStorage.setItem('ig-f',JSON.stringify(follows))}catch(e){}};
+const S={tab:'trending',q:'',side:'buy',sub:'act',cur:null,img:null,st:'loading',err:null,items:[],remote:null,rq:'',nav:0,req:0,upd:0,tradeSt:'idle',tradeSig:null,tradeErr:null};
+
+/* ============ components ============ */
+const hue=k=>{let h=0;for(const c of String(k))h=(h*31+c.charCodeAt(0))%360;return h};
+const fbAv=(t,s)=>`<div class="av" style="--h:${hue(t.id||t.tick)};width:${s}px;height:${s}px;font-size:${s*.45}px">${esc((t.tick||'?').slice(0,1).toUpperCase())}</div>`;
+const Avatar=(t,s=44)=>/^https:\/\//.test(t.img||'')?`<img class="av" src="${esc(t.img)}" width="${s}" height="${s}" alt="" referrerpolicy="no-referrer" loading="lazy" data-fb="${esc(fbAv(t,s))}" onerror="this.outerHTML=this.dataset.fb">`:/^data:image\//.test(t.img||'')?`<img class="av" src="${t.img}" width="${s}" height="${s}" alt="">`:fbAv(t,s);
+const age=t=>t.born?ago(Math.max(0,Math.floor((Date.now()-t.born)/60000))):'—';
+const Chg=c=>c==null?'<span class="chg mu">—</span>':`<span class="chg ${c>=0?'up':'dn'}">${c>=0?'▲':'▼'} ${pc(c)}</span>`;
+const mcl=t=>t.fdv?'FDV':'Market cap';
+const Card=t=>`<article class="card" data-go="${esc(t.id)}">
+ <div class="row">${Avatar(t)}<div class="nm"><b>${esc(t.name)}</b><span>$${esc(t.tick)} · ${age(t)}</span></div>
+ <button class="star ${follows.includes(t.id)?'on':''}" data-act="follow" data-id="${esc(t.id)}" aria-label="Follow">${follows.includes(t.id)?'★':'☆'}</button></div>
+ <div class="px"><b>$${fp(t.price)}</b>${Chg(t.chg)}</div>
+ <div class="kv"><div>${mcl(t)}<b>${usd(t.mc)}</b></div><div>Liquidity<b>${usd(t.liq)}</b></div></div>
+ <div class="btns"><a class="btn pri" href="#/token/${esc(t.id)}" data-act="buy" data-id="${esc(t.id)}">Buy</a><a class="btn" href="#/token/${esc(t.id)}">View</a></div></article>`;
+const Skel=`<div class="card" style="cursor:default"><div class="row"><div class="sk" style="width:44px;height:44px;border-radius:50%"></div><div style="flex:1"><div class="sk" style="height:14px;width:60%;margin-bottom:7px"></div><div class="sk" style="height:11px;width:35%"></div></div></div><div class="sk" style="height:26px;margin:14px 0 10px"></div><div class="sk" style="height:50px;margin-bottom:12px"></div><div class="sk" style="height:38px"></div></div>`;
+const ErrBox=e=>`<div class="empty"><b style="color:var(--tx);font-size:15px">Market data unavailable</b><br>${esc(e&&e.kind?e.message:'Something went wrong while loading data.')}${e&&e.kind==='net'?`<br><span style="font-size:12px">The browser couldn't reach api.dexscreener.com. Common causes: an ad-blocker or privacy extension blocking crypto-tracking domains, a network/DNS block, or (only if you're viewing this inside Claude's artifact preview rather than your own hosted copy) the preview's outside-request restriction. Open your browser's DevTools → Network tab, reload, and check the failed request to api.dexscreener.com for the exact reason (CORS, ERR_BLOCKED_BY_CLIENT, timeout, DNS).</span>`:''}<br><span style="font-size:12px">No placeholder data is shown.</span><br><button class="btn sm" style="margin-top:12px" data-act="retry">Retry</button></div>`;
+function Changes(t){return `<div class="m5" style="margin-top:0">${[['5m','m5'],['1h','h1'],['6h','h6'],['24h','h24']].map(([l,k])=>{const c=num(t.pcg[k]);return `<div>${l} change<b class="${c==null?'':c>=0?'up':'dn'}">${pc(c)}</b></div>`}).join('')}</div>
+ <div class="row" style="margin-top:12px;justify-content:space-between"><span class="note" style="margin:0;text-align:left">Price history isn't available from this data source yet.</span><a class="btn sm" target="_blank" rel="noopener" href="https://dexscreener.com/solana/${encodeURIComponent(t.pair)}">Live chart ↗</a></div>`}
+function estText(t){const v=parseFloat(($('#amt')||{}).value)||0;if(!SOLUSD||!t.price)return'—';return S.side==='buy'?cn(v*SOLUSD/t.price)+' '+t.tick:(v*t.price/SOLUSD).toFixed(4)+' SOL'}
+function TxStatus(){const st=S.tradeSt;if(!st||st==='idle')return'';
+ const exp=s=>'https://explorer.solana.com/tx/'+encodeURIComponent(s);
+ if(st==='confirmed')return `<div class="note" style="text-align:left;color:var(--g)">✓ Confirmed. <a href="${exp(S.tradeSig)}" target="_blank" rel="noopener" style="color:var(--g);text-decoration:underline">View on Solana Explorer ↗</a><br><span class="mu" style="font-family:ui-monospace,monospace;font-size:11px">${esc(S.tradeSig)}</span></div>`;
+ if(st==='failed')return `<div class="note dn" style="text-align:left">✗ ${esc(S.tradeErr||'Transaction failed.')}${S.tradeSig?`<br><a href="${exp(S.tradeSig)}" target="_blank" rel="noopener" style="color:var(--r);text-decoration:underline">View on Solana Explorer ↗</a>`:''}</div>`;
+ const L={quoting:'Getting quote from Jupiter…',building:'Building transaction…',approve:'Waiting for wallet approval…',sending:'Submitting to Solana…',confirming:'Confirming on-chain'+(S.tradeSig?' — '+short(S.tradeSig):'')+'…'};
+ return `<div class="note" style="text-align:left">⏳ ${esc(L[st]||'Working…')}</div>`}
+function Trade(t){const b=S.side==='buy',w=WalletService.address;
+ return `<div class="seg"><button class="b ${b?'on':''}" data-act="side" data-v="buy">Buy</button><button class="s ${b?'':'on'}" data-act="side" data-v="sell">Sell</button></div>
+ <label style="margin-top:0">Amount (${b?'SOL':t.tick})</label><input class="in" id="amt" type="number" min="0" step="any" placeholder="0.00" inputmode="decimal" oninput="updTrade()">
+ ${b?`<div class="chips">${[.1,.5,1,5].map(x=>`<button data-act="quick" data-v="${x}">${x} SOL</button>`).join('')}</div>`:''}
+ <div class="est"><span>${b?'You receive (est.)':'Est. proceeds (before fee)'}</span><b id="est" style="color:var(--tx)">—</b></div>
+ <div id="fee">${feeHtml(t,'')}</div>
+ <div class="est" style="margin-top:0"><span>Slippage</span><select class="in" id="slip" style="width:auto;padding:5px 8px"><option>1%</option><option selected>5%</option><option>10%</option></select></div>
+ <button class="btn w ${b?'pri':'sell'}" data-act="trade">${w?(b?'Buy ':'Sell ')+esc(t.tick):'Connect wallet to trade'}</button>
+ <div id="txstat">${TxStatus()}</div>
+ <div class="note">Estimates use live DEX Screener prices${SOLUSD?'':' (SOL price unavailable)'} and ignore price impact beyond Jupiter's own slippage protection. ${isRpcConfigured(RPC_CONFIG.SOLANA_RPC_URL)?"Trades route through Jupiter and require your wallet's approval — nothing is sent until you approve it.":'Trading is disabled until a Solana RPC endpoint is configured.'}</div>`}
+function Activity(t){let h;
+ if(S.sub==='act')h=`<table class="tbl"><tr><th>Window</th><th>Buys</th><th>Sells</th><th>Volume</th></tr>${[['5m','m5'],['1h','h1'],['6h','h6'],['24h','h24']].map(([l,k])=>{const x=t.txns[k]||{};return `<tr><td>${l}</td><td class="up">${x.buys==null?'—':x.buys}</td><td class="dn">${x.sells==null?'—':x.sells}</td><td>${usd(num(t.vols[k]))}</td></tr>`}).join('')}</table>`;
+ else h=`<div class="empty" style="padding:26px 10px">Holder data isn't available from this data source. It will come with direct Solana RPC integration.</div>`;
+ return `<div class="tabs" style="margin-bottom:8px">${[['act','Activity'],['h','Holders']].map(([k,l])=>`<button class="tab ${S.sub===k?'on':''}" data-act="sub" data-v="${k}">${l}</button>`).join('')}</div><div class="tw">${h}</div><div class="note">Trade counts and volume for this pair from DEX Screener. Individual transactions aren't listed.</div>`}
+
+/* ============ pages ============ */
+function feeState(t,raw){const buy=S.side==='buy';let l;
+ if(buy){const p=parseSol(raw);if(!p.ok)return{err:p.err};l=p.l}
+ else{const n=parseFloat(raw)||0;if(n<0||!isFinite(n))return{err:'Enter a valid amount.'};
+  if(n>0&&(!SOLUSD||!t.price))return{err:'SOL value unavailable, so the fee cannot be estimated.'};l=n>0?BigInt(Math.round(n*t.price/SOLUSD*1e9)):0n}
+ const q=quoteFee(S.side,l);return q.ok?{q}:{err:'Fee configuration invalid — trading blocked.'}}
+function feeHtml(t,raw){const s=feeState(t,raw),b=S.side==='buy',row=(a,c,st='')=>`<div class="est" style="margin:4px 0;${st}"><span>${a}</span><b style="color:var(--tx)">${c}</b></div>`;
+ if(s.err)return `<div class="note dn" style="text-align:left">${esc(s.err)}</div>`;const q=s.q;
+ return row(b?'Trade amount':'Est. proceeds',fmtSol(q.amount)+' SOL')+row('Platform fee ('+q.feeBps/100+'%)',fmtSol(q.fee)+' SOL')+row(b?'Total (you pay)':'You receive (est. net)',fmtSol(q.total)+' SOL','border-top:1px solid var(--ln);padding-top:6px')+`<div class="note" style="text-align:left;margin-top:4px">${q.treasuryReady?'':'Fee destination not configured. '}Fees aren't collected yet — nothing is charged.</div>`}
+const currentQuote=()=>{const s=S.cur&&feeState(S.cur,($('#amt')||{}).value);return s&&s.q||null};
+function updTrade(){$('#est').textContent=estText(S.cur);$('#fee').innerHTML=feeHtml(S.cur,($('#amt')||{}).value)}
+function launchFeeNote(){const v=validateConfig(PUBLIC_CONFIG),f=PUBLIC_CONFIG.TOKEN_LAUNCH_FEE_SOL;
+ return !v.ok?'Launch fee configuration is invalid.':f>0?'Future launch fee: '+f+' SOL. Launch payments are not active yet.':'Launch fee: not set. Launch payments are not active yet.'}
+async function loadAdmin(){const r=S.nav,a=$('#app'),s=await RevenueService.summary();if(r===S.nav)a.innerHTML=Admin(s)}
+function Admin(s){const c=PUBLIC_CONFIG,v=validateConfig(c),m=(l,x)=>`<div>${l}<b>${x}</b></div>`,row=(l,x)=>`<div class="est" style="margin:6px 0"><span>${l}</span><b style="color:var(--tx)">${x}</b></div>`,sol=x=>fmtSol(x)+' SOL';
+ return `<h1>Revenue</h1><p class="mu" style="margin-bottom:14px">Internal dashboard · read-only</p>
+ <div class="demo"><b class="dn">Live revenue collection is NOT active.</b> No fees are charged and no trades are executed. Figures count only confirmed fee records from a backend; none is connected.</div>
+ <section class="box" style="margin-bottom:14px"><div class="m5" style="margin-top:0">${m('Total platform fees',sol(s.totalFees))}${m('Total trading volume',sol(s.volume))}${m('Trades',s.trades)}${m('Fee-generating transactions',s.feeTxs)}${m('Token-launch fees',sol(s.launchFees))}${m('Creator fees',sol(s.creatorFees))}${m('Platform net revenue',sol(s.net))}</div>
+ ${s.source==='none'?'<div class="note">No revenue yet.</div>':''}<div class="note" style="text-align:left">Net = total platform fees − creator fees paid out.</div></section>
+ <section class="box" style="margin-bottom:14px"><h2>Configuration (read-only)</h2>${row('Platform trading fee',c.PLATFORM_FEE_BPS/100+'% ('+c.PLATFORM_FEE_BPS+' bps)')}${row('Treasury wallet',c.PLATFORM_TREASURY_WALLET?short(c.PLATFORM_TREASURY_WALLET):'Not configured')}${row('Token launch fee',c.TOKEN_LAUNCH_FEE_SOL==null?'Not set':c.TOKEN_LAUNCH_FEE_SOL+' SOL')}${row('Fee collection','Disabled')}${row('Config check',v.ok?'Valid':'Invalid')}${v.errors.map(e=>`<div class="note dn" style="text-align:left">${esc(e)}</div>`).join('')}
+ <div class="note" style="text-align:left">Set in code (PUBLIC_CONFIG); not editable here. This page has no login and holds no data or controls. Real admin access needs an authenticated backend.</div></section>
+ <section class="box"><h2>Fee history</h2>${s.records.length?`<div class="tw"><table class="tbl"><tr><th>Time</th><th>Type</th><th>Token</th><th>Wallet</th><th>Amount</th><th>Fee</th><th>Status</th><th>Signature</th></tr>${s.records.slice(0,50).map(r=>`<tr><td>${new Date(r.timestamp).toLocaleString()}</td><td>${esc(r.type)}</td><td>${r.tokenMint?short(r.tokenMint):'—'}</td><td>${short(r.userWallet)}</td><td>${fmtSol(r.tradeAmount)}</td><td>${fmtSol(r.platformFee)}</td><td>${esc(r.status)}</td><td>${r.signature?short(r.signature):'—'}</td></tr>`).join('')}</table></div>`:'<div class="empty" style="padding:22px 10px">No fee records. No backend is connected.</div>'}</section>`}
+const gName=u=>(u.name||u.email||'Account').split(' ')[0];
+const gAv=(u,z)=>Avatar({img:u.photo,tick:u.name||u.email||'?',id:u.uid},z);
+function updAcct(){const a=AuthService,u=a.user,h=$('#acct');if(!h)return;
+ h.innerHTML=a.status==='loading'?'':u?`<a class="btn" href="#/account" title="Account">${gAv(u,22)}<span class="hide-m">${esc(gName(u))}</span></a><button class="btn hide-m" data-act="gout">Sign out</button>`:`<button class="btn" data-act="gsignin"><span class="hide-m">Continue with </span>Google</button>`;
+ const l=$('#al');if(l)l.textContent=u?'Account':'Sign in'}
+function Account(){const a=AuthService,u=a.user,w=WalletService.address,row=(l,x)=>`<div class="est" style="margin:6px 0"><span>${l}</span><b style="color:var(--tx)">${x}</b></div>`;let g;
+ if(a.status==='loading')g='<div class="sk" style="height:70px"></div>';
+ else if(u)g=`<div class="row">${gAv(u,56)}<div class="nm"><b style="font-size:18px">${esc(u.name||'Google user')}</b><span>${esc(u.email||'No email on this account')}</span></div></div><div style="margin-top:10px">${row('Google account','Signed in')}${row('Email verified',u.emailVerified?'Yes':'No')}</div><button class="btn w" style="margin-top:8px" data-act="gout">Sign out</button>`;
+ else g=`<p class="mu" style="margin-bottom:12px">Sign in to create a platform account. Google sign-in never gives us access to any wallet.</p><button class="btn pri w" data-act="gsignin">Continue with Google</button>${a.err?`<div class="note dn" style="text-align:left">${esc(a.err)}</div>`:''}${a.status==='unconfigured'?'<div class="note" style="text-align:left">Google sign-in is not configured yet. The site owner must add the Firebase web-app settings (FIREBASE_CONFIG) and enable the Google provider.</div>':''}`;
+ const wl=w?`${row('Wallet',esc(WalletService.wallet.name))}${row('Address',short(w)+' <button class="btn sm" data-act="copy" data-v="'+esc(w)+'">Copy</button>')}${row('Account link',WalletLinkService.status()==='linked'?'Linked':'Not linked')}<div class="note" style="text-align:left">Connected to this site only. Linking it to your account will require signing a message with this wallet, which is not available yet; nothing is stored.</div><button class="btn w" style="margin-top:8px" data-act="wdisc">Disconnect wallet</button>`:`<p class="mu">No wallet connected.</p><button class="btn w" style="margin-top:8px" data-act="wallet">Connect wallet</button>`;
+ return `<h1>Account</h1><p class="mu" style="margin-bottom:14px">Google account and Solana wallet are separate.</p><section class="box" style="margin-bottom:14px"><h2>Google account</h2>${g}</section><section class="box"><h2>Solana wallet</h2>${wl}</section><div class="note">Signing in with Google does not grant admin access or control of any wallet.</div>`}
+const renderAccount=()=>{if(location.hash.startsWith('#/account'))$('#app').innerHTML=Account()};
+let _gb=false;async function doSignIn(){if(_gb)return;_gb=true;try{const r=await AuthService.signIn();if(r.ok&&!r.redirecting)toast('Signed in');else if(r.cancelled)toast('Sign-in cancelled');else if(!r.ok)toast(r.message)}finally{_gb=false}}
+const TABS=[['trending','🔥 Trending'],['new','✨ New'],['gainers','📈 Gainers'],['following','★ Following']];
+function Home(){return `<div class="stats"><div class="stat"><span>Tokens</span><b id="s1">—</b></div><div class="stat"><span>Launched today</span><b id="s2">—</b></div><div class="stat"><span>Following</span><b id="fc">${follows.length}</b></div></div>
+ <div class="demo row" style="justify-content:space-between;gap:8px"><span id="dl"></span><button class="btn sm" data-act="retry">Refresh</button></div>
+ <div class="tabs" id="tabs">${TABS.map(([k,l])=>`<button class="tab ${S.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}</div><div class="grid" id="grid"></div>`}
+async function loadHome(force){const r=++S.req;S.st='loading';S.err=null;renderList();
+ try{const it=S.tab==='following'?(follows.length?await fetchTokens(follows,force):[]):await loadPool(force);if(r!==S.req)return;S.items=it;S.st='ok';S.upd=Date.now()}
+ catch(e){if(r!==S.req)return;S.st='error';S.err=e}
+ renderList()}
+function listTokens(){const q=S.q.trim().toLowerCase();let l=[...S.items];
+ if(q.length>=2&&S.remote&&S.rq===S.q.trim())l=[...S.remote];
+ else if(q)l=l.filter(t=>(t.name+' '+t.tick+' '+t.id).toLowerCase().includes(q));
+ if(S.tab==='new')l=l.filter(t=>t.born).sort((a,b)=>b.born-a.born);
+ else if(S.tab==='gainers')l=l.filter(t=>t.chg>0).sort((a,b)=>b.chg-a.chg);
+ else if(S.tab==='following')l=l.filter(t=>follows.includes(t.id));
+ else l.sort((a,b)=>(b.vol||0)-(a.vol||0));return l}
+function renderList(){const g=$('#grid');if(!g)return;const ok=S.st==='ok';
+ $('#dl').textContent=ok?'Live data · DEX Screener (Solana) · updated '+new Date(S.upd).toLocaleTimeString():S.st==='loading'?'Loading live market data…':'Live market data unavailable';
+ document.querySelectorAll('#tabs .tab').forEach((b,i)=>b.classList.toggle('on',TABS[i][0]===S.tab));
+ $('#fc').textContent=follows.length;$('#s1').textContent=ok?S.items.length:'—';$('#s2').textContent=ok?S.items.filter(t=>t.born&&Date.now()-t.born<864e5).length:'—';
+ if(S.st==='error'){g.innerHTML=ErrBox(S.err);return}
+ if(S.st==='loading'&&!S.items.length){g.innerHTML=Skel.repeat(6);return}
+ const l=listTokens();g.innerHTML=l.length?l.map(Card).join(''):`<div class="empty">${S.tab==='following'&&!S.q?'Star a token to follow it.':'No tokens match.'}</div>`}
+let _st;function searchRemote(){clearTimeout(_st);const q=S.q.trim();if(q.length<2){S.remote=null;S.rq='';renderList();return}
+ _st=setTimeout(async()=>{try{const r=await searchTokens(q);if(q!==S.q.trim())return;S.remote=r;S.rq=q}
+  catch(e){if(q!==S.q.trim())return;S.remote=null;S.rq='';toast((e.kind?e.message:'Search failed.')+' Showing matches from loaded tokens only.')}renderList()},450)}
+function TokenPage(t){S.cur=t;
+ return `<div class="tp"><section class="box top"><div class="row">${Avatar(t,56)}<div class="nm"><b style="font-size:22px">${esc(t.name)}</b><span>$${esc(t.tick)} · pair created ${age(t)}</span></div>
+ <button class="star ${follows.includes(t.id)?'on':''}" data-act="follow" data-id="${esc(t.id)}">${follows.includes(t.id)?'★':'☆'}</button></div>
+ <div class="ca">CA ${short(t.ca)}<button class="btn sm" data-act="copy" data-v="${esc(t.ca)}">Copy</button></div>
+ <p class="mu" style="margin-top:10px">${esc(t.desc||'No description provided by the token profile.')}${t.dex?` <span style="font-size:12px">· ${esc(t.dex)}</span>`:''}</p>
+ <div class="m5"><div>Price<b>$${fp(t.price)}</b></div><div>24h change<b class="${t.chg==null?'':t.chg>=0?'up':'dn'}">${pc(t.chg)}</b></div><div>${mcl(t)}<b>${usd(t.mc)}</b></div><div>Liquidity<b>${usd(t.liq)}</b></div><div>24h volume<b>${usd(t.vol)}</b></div></div></section>
+ <section class="box chart" id="chart">${Changes(t)}</section><section class="box trade" id="trade">${Trade(t)}</section><section class="box act" id="act">${Activity(t)}</section></div>`}
+const TokSkel='<div class="tp"><div class="box sk top" style="height:190px"></div><div class="box sk chart" style="height:150px"></div><div class="box sk trade" style="height:260px"></div></div>';
+async function loadToken(id,force){const r=S.nav,a=$('#app');
+ try{const [l]=await Promise.all([fetchTokens([id],force),loadSol(force)]);if(r!==S.nav)return;
+  if(!l.length){a.innerHTML='<div class="empty">No Solana trading pair found for this address.<br><a class="up" href="#/">Back to discover</a></div>';return}
+  S.side='buy';S.sub='act';S.tradeSt='idle';S.tradeSig=null;S.tradeErr=null;a.innerHTML=TokenPage(l[0])}
+ catch(e){if(r===S.nav)a.innerHTML=ErrBox(e)}}
+function Create(){S.img=null;
+ return `<h1>Create token</h1><p class="mu" style="margin-bottom:16px">Design your token. Launching on Solana isn't connected yet — this flow doesn't submit anything yet.</p>
+ <div class="cr"><div class="box form"><label style="margin-top:0">Token image</label><label class="up-img" for="img"><span id="imgl">Tap to upload PNG / JPG</span></label><input id="img" type="file" accept="image/*" hidden onchange="pickImg(this)">
+ <label>Name</label><input class="in" id="cn" maxlength="32" placeholder="e.g. Rocket Cat" oninput="prev()">
+ <label>Ticker</label><input class="in" id="ct" maxlength="10" placeholder="e.g. RCAT" oninput="prev()">
+ <label>Description</label><textarea class="in" id="cd" rows="3" maxlength="240" placeholder="What is this token about?"></textarea>
+ <label>Website</label><input class="in" id="c1" placeholder="https://"><label>X / Twitter</label><input class="in" id="c2" placeholder="https://x.com/…"><label>Telegram</label><input class="in" id="c3" placeholder="https://t.me/…">
+ <button class="btn pri w" style="margin-top:18px" data-act="launch">Launch Token</button><div class="note">Nothing is submitted to Solana. Requires wallet + on-chain integration.<br>${launchFeeNote()}</div></div>
+ <div><div class="mu" style="margin-bottom:8px;font-size:12px">PREVIEW</div><div id="pv"></div></div></div>`}
+function prev(){const t={id:'x',name:$('#cn').value||'Token name',tick:($('#ct').value||'TICK').toUpperCase(),emoji:'🚀',hue:160,img:S.img,price:null,chg:null,mc:null,liq:null,born:null};$('#pv').innerHTML=Card(t).replace('data-go="x"','').replace(/data-act="buy"/,'')}
+function pickImg(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.img=r.result;$('#imgl').textContent='✓ '+f.name;prev()};r.readAsDataURL(f)}
+
+/* ============ router ============ */
+function route(force){const p=location.hash.slice(2).split('/'),a=$('#app'),pg=p[0]||'home';S.nav++;S.req++;S.cur=null;
+ document.querySelectorAll('[data-n]').forEach(e=>e.classList.toggle('on',e.dataset.n===(pg==='token'?'home':pg)));
+ if(pg==='token'){const id=p[1]||'';if(!MINT.test(id))a.innerHTML='<div class="empty">Invalid token address. <a class="up" href="#/">Back to discover</a></div>';else{a.innerHTML=TokSkel;loadToken(id,force===true)}}
+ else if(pg==='create'){a.innerHTML=Create();prev()}
+ else if(pg==='account'){a.innerHTML=Account()}
+ else if(pg==='admin'){a.innerHTML='<div class="box sk" style="height:160px"></div>';loadAdmin()}
+ else{a.innerHTML=Home();loadHome(force===true)}
+ a.style.animation='none';a.offsetHeight;a.style.animation='';window.scrollTo(0,0)}
+addEventListener('hashchange',route);
+
+/* ============ events ============ */
+$('#q').addEventListener('input',e=>{S.q=e.target.value;if(location.hash.startsWith('#/token')||location.hash.startsWith('#/create'))location.hash='#/';else renderList();searchRemote()});
+function updWallet(){const w=WalletService.address;$('#wbtn').textContent=w?short(w):'Connect Wallet';$('#wl').textContent=w?short(w):'Wallet';if(S.cur&&$('#trade'))$('#trade').innerHTML=Trade(S.cur)}
+/* wallet modal */
+const W={open:false,busy:null,err:''};
+const wIcon=w=>w&&/^data:image\//.test(w.icon||'')?`<img src="${w.icon}" width="32" height="32" style="border-radius:9px" alt="">`:`<div class="av" style="--h:160;width:32px;height:32px;border-radius:9px;font-size:16px">◈</div>`;
+function renderWM(){const ws=WalletService.list(),a=WalletService.address,m=$('#wm');m.classList.toggle('open',W.open);if(!W.open)return;let b;
+ if(a)b=`<div class="row" style="margin-bottom:12px">${wIcon(WalletService.wallet)}<div class="nm"><b>${esc(WalletService.wallet.name)}</b><span class="up">Connected</span></div></div>
+  <div class="ca" style="display:flex;justify-content:space-between;width:100%">${short(a)}<button class="btn sm" data-act="copy" data-v="${a}">Copy address</button></div>
+  <div class="note" style="text-align:left">Balance isn't shown yet — reading it requires a Solana RPC connection (a later step).</div>
+  <button class="btn w" style="margin-top:12px" data-act="wdisc">Disconnect</button>`;
+ else if(ws.length)b=ws.map(w=>`<button class="wl" data-act="wpick" data-v="${esc(w.name)}">${wIcon(w)}<b>${esc(w.name)}</b><span class="mu">${W.busy===w.name?'Connecting…':'Detected'}</span></button>`).join('')+(W.err?`<div class="note dn">${esc(W.err)}</div>`:'');
+ else b=`<div class="empty" style="padding:22px 10px;margin-bottom:10px">No Solana wallet detected in this browser.<br>Install one, then reload.</div><div class="btns" style="grid-template-columns:repeat(3,1fr)"><a class="btn sm" target="_blank" rel="noopener" href="https://phantom.app">Phantom</a><a class="btn sm" target="_blank" rel="noopener" href="https://solflare.com">Solflare</a><a class="btn sm" target="_blank" rel="noopener" href="https://backpack.app">Backpack</a></div>`;
+ m.innerHTML=`<div class="md"><div class="row" style="margin-bottom:14px"><h2 style="margin:0">${a?'Wallet':'Connect a wallet'}</h2><button class="star" style="font-size:22px" data-act="wclose" aria-label="Close">✕</button></div>${b}</div>`}
+const openWM=()=>{W.open=true;W.err='';renderWM()},closeWM=()=>{W.open=false;renderWM()};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&W.open)closeWM()});
+document.addEventListener('click',async e=>{
+ const el=e.target.closest('[data-act]');
+ if(!el){const c=e.target.closest('[data-go]');if(c&&!e.target.closest('a,button'))location.hash='#/token/'+c.dataset.go;return}
+ const a=el.dataset.act,v=el.dataset.v,id=el.dataset.id;
+ if(a==='follow'){e.preventDefault();e.stopPropagation();follows=follows.includes(id)?follows.filter(x=>x!==id):[...follows,id];saveF();
+  if($('#grid'))renderList();else{el.classList.toggle('on');el.textContent=follows.includes(id)?'★':'☆'}}
+ else if(a==='tab'){S.tab=v;loadHome()}
+ else if(a==='copy'){try{await navigator.clipboard.writeText(v);toast('Contract address copied')}catch(x){toast('Copy failed — select the address manually')}}
+ else if(a==='retry'){if(location.hash.startsWith('#/token'))route(true);else if(!location.hash.startsWith('#/create'))loadHome(true)}
+ else if(a==='side'){S.side=v;$('#trade').innerHTML=Trade(S.cur)}
+ else if(a==='sub'){S.sub=v;$('#act').innerHTML=Activity(S.cur)}
+ else if(a==='quick'){$('#amt').value=v;updTrade()}
+ else if(a==='gsignin'){if(AuthService.status==='unconfigured'){if(!location.hash.startsWith('#/account'))location.hash='#/account';toast('Google sign-in is not configured yet.')}else doSignIn()}
+ else if(a==='gout'){const r=await AuthService.signOut();toast(r.ok?'Signed out':r.message)}
+ else if(a==='wallet')openWM();
+ else if(a==='wclose')closeWM();
+ else if(a==='wbg'){if(e.target===el)closeWM()}
+ else if(a==='wpick'){if(W.busy)return;W.busy=v;W.err='';renderWM();try{await WalletService.connect(v);W.busy=null;closeWM();toast('Wallet connected')}catch(x){W.busy=null;W.err=(x&&x.message)||'Connection was cancelled.';renderWM()}}
+ else if(a==='wdisc'){await WalletService.disconnect();closeWM();toast('Wallet disconnected')}
+ else if(a==='trade'){if(el.disabled)return;if(!WalletService.address)openWM();else{const r=await TradeService.trade(currentQuote());toast(r.ok?'Trade confirmed: '+short(r.signature):r.reason)}}
+ else if(a==='buy'){setTimeout(()=>$('#trade')&&$('#trade').scrollIntoView({behavior:'smooth'}),80)}
+ else if(a==='launch'){const n=$('#cn').value.trim(),k=$('#ct').value.trim();if(!n||!k)return toast('Name and ticker are required');const r=await TradeService.createToken();toast(r.reason)}
+});
+WalletService.on(()=>{updWallet();if(W.open)renderWM();renderAccount()});WalletService.init();
+AuthService.on(()=>{updAcct();renderAccount()});updAcct();AuthService.init();
+if(!location.hash)location.hash='#/';route();
+</script></body></html>
